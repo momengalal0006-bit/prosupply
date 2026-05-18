@@ -1,0 +1,265 @@
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { apiFetch, apiPut, apiDelete } from '../services/api';
+import { useToast } from '../hooks/useToast';
+import { useAuth } from '../hooks/useAuth';
+import { normalizeDocUrl } from '../utils/helpers';
+import Pagination from '../components/common/Pagination';
+import '../styles/pages/admin.css';
+
+function AdminSidebar() {
+  const loc = useLocation();
+  const { logout } = useAuth();
+  const navItems = [
+    { to: '/admin', label: '📊 Dashboard' },
+    { to: '/admin/users', label: '👥 Users' },
+    { to: '/admin/ads', label: '📦 Ads' },
+    { to: '/admin/applications', label: '📋 Applications' },
+    { to: '/admin/commissions', label: '💰 Commissions' },
+  ];
+  return (
+    <aside className="admin-sidebar">
+      <Link to="/admin" className="admin-logo-link"><img src="/images/logo.png" alt="ProSupply" className="admin-logo-img" /></Link><p>Admin Panel</p>
+      <nav className="admin-nav">{navItems.map((n) => <Link key={n.to} to={n.to} className={loc.pathname === n.to ? 'active' : ''}>{n.label}</Link>)}</nav>
+    </aside>
+  );
+}
+
+function AdminShell({ title, children }) {
+  const { logout } = useAuth();
+  return (
+    <div className="admin-layout">
+      <AdminSidebar />
+      <main className="admin-main">
+        <div className="admin-topbar"><h1>{title}</h1><button className="admin-logout" onClick={async () => { await logout(); window.location.href = '/login'; }}>Logout</button></div>
+        {children}
+      </main>
+    </div>
+  );
+}
+
+/* ── Dashboard ── */
+export function AdminDashboardPage() {
+  const [stats, setStats] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [flagged, setFlagged] = useState([]);
+  const [recalculating, setRecalculating] = useState(false);
+  const showToast = useToast();
+
+  useEffect(() => {
+    (async () => {
+      const [r1, r2, r3] = await Promise.all([
+        apiFetch('/api/admin/dashboard'),
+        apiFetch('/api/admin/users?page=1&limit=10'),
+        apiFetch('/api/admin/trust/flagged'),
+      ]);
+      if (r1?.success) setStats(r1.data);
+      if (r2?.success) setUsers(r2.data.items || []);
+      if (r3?.success) setFlagged(r3.data || []);
+    })();
+  }, []);
+
+  async function recalcTrust() {
+    setRecalculating(true);
+    const r = await apiFetch('/api/admin/trust/recalculate', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+    if (r?.success) {
+      showToast(`Trust scores recalculated for ${r.data.results?.length || 0} sellers.`);
+      const r3 = await apiFetch('/api/admin/trust/flagged');
+      if (r3?.success) setFlagged(r3.data || []);
+    } else {
+      showToast(r?.message || 'Failed.', true);
+    }
+    setRecalculating(false);
+  }
+
+  function trustBadge(score) {
+    const s = parseFloat(score);
+    if (isNaN(s)) return <span className="badge" style={{background:'rgba(255,255,255,0.1)',color:'#94A3B8'}}>—</span>;
+    let cls = 'badge-approved', label = s;
+    if (s < 40) cls = 'badge-banned';
+    else if (s < 60) cls = 'badge-pending_review';
+    return <span className={`badge ${cls}`}>{s}/100</span>;
+  }
+
+  return (
+    <AdminShell title="Admin Dashboard">
+      {stats && <div className="admin-stats">
+        <div className="admin-stat"><span className="val">{stats.totalUsers}</span><span className="lbl">Total Users</span></div>
+        <div className="admin-stat"><span className="val">{stats.pendingApplications}</span><span className="lbl">Pending Applications</span></div>
+        <div className="admin-stat"><span className="val">{stats.activeAds}</span><span className="lbl">Active Ads</span></div>
+        <div className="admin-stat"><span className="val">{stats.totalOrders}</span><span className="lbl">Total Orders Processed</span></div>
+        <div className="admin-stat"><span className="val" style={{color:'#4ade80'}}>EGP {parseFloat(stats.totalCommissions).toLocaleString('en-US',{minimumFractionDigits:2})}</span><span className="lbl">Total Commission Earned</span></div>
+      </div>}
+
+      {/* Flagged Sellers — Fraud Detection */}
+      <div className="admin-card" style={{marginBottom:'1.5rem'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}}>
+          <h2 style={{margin:0}}>🛡️ Flagged Sellers — Fraud Detection <span style={{background:'linear-gradient(135deg,#818cf8,#c084fc)',color:'white',fontSize:'0.6rem',fontWeight:700,padding:'2px 8px',borderRadius:20,marginLeft:8,textTransform:'uppercase',letterSpacing:'0.5px'}}>AI Powered</span></h2>
+          <button className="action-btn btn-approve" onClick={recalcTrust} disabled={recalculating} style={{padding:'0.5rem 1rem'}}>
+            {recalculating ? 'Recalculating...' : '🔄 Recalculate Scores'}
+          </button>
+        </div>
+        {flagged.length === 0 ? <p style={{color:'rgba(255,255,255,.5)'}}>No flagged sellers. All sellers have good trust scores.</p> :
+        <table className="admin-table"><thead><tr><th>Seller</th><th>Email</th><th>Trust Score</th><th>Flags</th></tr></thead>
+          <tbody>{flagged.map((f) => <tr key={f.id}>
+            <td>{f.fullName}</td>
+            <td>{f.email}</td>
+            <td>{trustBadge(f.trustAnalysis?.score)}</td>
+            <td>{f.trustAnalysis?.flags?.length > 0 ?
+              <ul style={{margin:0,padding:0,listStyle:'none'}}>
+                {f.trustAnalysis.flags.map((fl,i) => <li key={i} style={{fontSize:'0.78rem',color:'#f87171',marginBottom:2}}>⚠️ {fl}</li>)}
+              </ul> : <span style={{color:'rgba(255,255,255,.4)'}}>None</span>}
+            </td>
+          </tr>)}</tbody></table>}
+      </div>
+
+      <div className="admin-card"><h2>Recent Users</h2>
+        {users.length > 0 ? <table className="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Seller Status</th><th>Trust</th></tr></thead>
+          <tbody>{users.map((u) => <tr key={u.id}><td>{u.fullName}</td><td>{u.email}</td><td><span className={`badge badge-${u.sellerStatus}`}>{u.sellerStatus}</span></td><td>{u.sellerStatus === 'approved' ? trustBadge(u.trustScore) : '—'}</td></tr>)}</tbody></table> : <p style={{color:'rgba(255,255,255,.6)'}}>No users.</p>}
+      </div>
+    </AdminShell>
+  );
+}
+
+/* ── Users ── */
+export function AdminUsersPage() {
+  const showToast = useToast();
+  const [users, setUsers] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState('');
+  const [confirmModal, setConfirmModal] = useState(null);
+
+  async function load(p, s) {
+    const params = new URLSearchParams({ page: p || 1, limit: 15 });
+    if (s) params.set('search', s);
+    const res = await apiFetch(`/api/admin/users?${params}`);
+    if (res?.success) { setUsers(res.data.items); setPage(res.data.pagination.page); setTotalPages(res.data.pagination.totalPages); }
+  }
+  useEffect(() => { load(1, ''); }, []);
+
+  async function banUser(id) { const r = await apiPut(`/api/admin/users/${id}/ban`, {}); if (r?.success) { showToast('Banned.'); load(page, search); } else showToast(r?.message || 'Failed.', true); }
+  async function unbanUser(id) { const r = await apiPut(`/api/admin/users/${id}/unban`, {}); if (r?.success) { showToast('Unbanned.'); load(page, search); } else showToast(r?.message || 'Failed.', true); }
+  async function deleteUser(id) { const r = await apiDelete(`/api/admin/users/${id}`); setConfirmModal(null); if (r?.success) { showToast('Deleted.'); load(page, search); } else showToast(r?.message || 'Failed.', true); }
+
+  const debounceRef = useRef(null);
+  function onSearch(val) { setSearch(val); clearTimeout(debounceRef.current); debounceRef.current = setTimeout(() => load(1, val), 300); }
+
+  return (
+    <AdminShell title="User Management">
+      <input className="search-bar" placeholder="Search by name or email..." value={search} onChange={(e) => onSearch(e.target.value)} />
+      <table className="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Seller Status</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody>{users.map((u) => {
+          const role = u.role === 'admin' ? 'admin' : u.sellerStatus === 'approved' ? 'seller' : u.role;
+          return <tr key={u.id}><td>{u.fullName}</td><td>{u.email}</td><td><span className={`badge badge-${role}`}>{role}</span></td>
+            <td><span className={`badge badge-${u.sellerStatus}`}>{u.sellerStatus}</span></td>
+            <td>{u.isBanned ? <span className="badge badge-banned">Banned</span> : <span className="badge badge-approved">Active</span>}</td>
+            <td>{new Date(u.createdAt).toLocaleDateString()}</td>
+            <td>{u.isBanned ? <button className="action-btn btn-unban" onClick={() => unbanUser(u.id)}>Unban</button> : <button className="action-btn btn-ban" onClick={() => banUser(u.id)}>Ban</button>}
+              {u.role !== 'admin' && <button className="action-btn btn-delete" onClick={() => setConfirmModal(u)}>Delete</button>}</td></tr>;
+        })}</tbody></table>
+      <Pagination page={page} totalPages={totalPages} onPageChange={(p) => load(p, search)} />
+      {confirmModal && <div className="confirm-overlay active"><div className="confirm-card cyan-frame"><h3>Delete User</h3><p>Delete "{confirmModal.fullName}"?</p>
+        <div className="confirm-actions"><button className="confirm-yes" onClick={() => deleteUser(confirmModal.id)}>Yes</button><button className="confirm-no" onClick={() => setConfirmModal(null)}>Cancel</button></div></div></div>}
+    </AdminShell>
+  );
+}
+
+/* ── Ads ── */
+export function AdminAdsPage() {
+  const showToast = useToast();
+  const [ads, setAds] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState('');
+
+  async function load(p, s) {
+    const params = new URLSearchParams({ page: p || 1, limit: 15 });
+    if (s) params.set('search', s);
+    const res = await apiFetch(`/api/admin/ads?${params}`);
+    if (res?.success) { setAds(res.data.items); setPage(res.data.pagination.page); setTotalPages(res.data.pagination.totalPages); }
+  }
+  useEffect(() => { load(1, ''); }, []);
+
+  async function deleteAd(id) {
+    const r = await apiDelete(`/api/admin/ads/${id}`);
+    if (r?.success) { showToast('Deleted.'); load(page, search); } else showToast(r?.message || 'Failed.', true);
+  }
+
+  const debounceRef = useRef(null);
+  function onSearch(val) { setSearch(val); clearTimeout(debounceRef.current); debounceRef.current = setTimeout(() => load(1, val), 300); }
+
+  return (
+    <AdminShell title="Ads Management">
+      <input className="search-bar" placeholder="Search ads..." value={search} onChange={(e) => onSearch(e.target.value)} />
+      <table className="admin-table"><thead><tr><th>Title</th><th>Seller</th><th>Price</th><th>Status</th><th>Origin</th><th>Date</th><th>Action</th></tr></thead>
+        <tbody>{ads.map((a) => <tr key={a.id}><td><button type="button" onClick={() => window.open(`/product/${a.id}`, '_blank', 'noopener,noreferrer')} style={{background:'none',border:'none',padding:0,color:'#60a5fa',cursor:'pointer',textAlign:'left'}}>{a.title}</button></td><td>{a.seller?.fullName||'N/A'}</td><td>EGP {parseFloat(a.price).toFixed(2)}</td>
+          <td><span className={`badge badge-${a.status}`}>{a.status}</span></td><td>{a.countryOfOrigin||'—'}</td><td>{new Date(a.createdAt).toLocaleDateString()}</td>
+          <td>{a.status==='active' && <button className="action-btn btn-delete" onClick={() => deleteAd(a.id)}>Delete</button>}</td></tr>)}</tbody></table>
+      <Pagination page={page} totalPages={totalPages} onPageChange={(p) => load(p, search)} />
+    </AdminShell>
+  );
+}
+
+/* ── Applications ── */
+export function AdminApplicationsPage() {
+  const showToast = useToast();
+  const [apps, setApps] = useState([]);
+  const [statusFilter, setStatusFilter] = useState('');
+
+  async function load(status) {
+    const url = status ? `/api/admin/seller-applications?status=${status}` : '/api/admin/seller-applications';
+    const res = await apiFetch(url);
+    if (res?.success) setApps(res.data || []);
+  }
+  useEffect(() => { load(''); }, []);
+
+  async function approve(id) { const r = await apiPut(`/api/admin/seller-applications/${id}/approve`, {}); if (r?.success) { showToast('Approved!'); load(statusFilter); } else showToast(r?.message||'Failed.', true); }
+  async function reject(id) { const r = await apiPut(`/api/admin/seller-applications/${id}/reject`, {}); if (r?.success) { showToast('Rejected.'); load(statusFilter); } else showToast(r?.message||'Failed.', true); }
+
+  return (
+    <AdminShell title="Seller Applications">
+      <div className="filter-tabs">
+        {[{v:'',l:'All'},{v:'pending_review',l:'Pending'},{v:'approved',l:'Approved'},{v:'rejected',l:'Rejected'}].map((f) =>
+          <button key={f.v} className={`filter-tab${statusFilter===f.v?' active':''}`} onClick={() => { setStatusFilter(f.v); load(f.v); }}>{f.l}</button>
+        )}
+      </div>
+      {apps.length === 0 ? <p style={{color:'rgba(255,255,255,0.5)',padding:'2rem'}}>No applications.</p> :
+      <table className="admin-table"><thead><tr><th>Applicant</th><th>Email</th><th>Business</th><th>Documents</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>{apps.map((a) => <tr key={a.id}><td>{a.User?.fullName||'N/A'}</td><td>{a.User?.email||'N/A'}</td><td>{a.businessName}</td>
+          <td>{Array.isArray(a.documents) && a.documents.length > 0 ? a.documents.map((d,i) => <a key={i} href={normalizeDocUrl(d)} target="_blank" rel="noopener noreferrer">Doc {i+1}<br/></a>) : <span style={{opacity:.65}}>No docs</span>}</td>
+          <td>{new Date(a.submittedAt||a.createdAt).toLocaleDateString()}</td>
+          <td><span className={`badge badge-${a.status}`}>{a.status.replace('_',' ')}</span></td>
+          <td>{a.status==='pending_review' && <><button className="action-btn btn-approve" onClick={() => approve(a.id)}>Approve</button><button className="action-btn btn-reject" onClick={() => reject(a.id)}>Reject</button></>}</td></tr>)}</tbody></table>}
+    </AdminShell>
+  );
+}
+
+/* ── Commissions ── */
+export function AdminCommissionsPage() {
+  const [items, setItems] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCommissions, setTotalCommissions] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+
+  async function load(p) {
+    const res = await apiFetch(`/api/admin/commissions?page=${p||1}&limit=15`);
+    if (res?.success) { setItems(res.data.items); setPage(res.data.pagination.page); setTotalPages(res.data.pagination.totalPages); setTotalCommissions(res.data.totalCommissions); setTotalItems(res.data.pagination.totalItems); }
+  }
+  useEffect(() => { load(1); }, []);
+
+  return (
+    <AdminShell title="Commission Earnings">
+      <div className="admin-stats">
+        <div className="admin-stat"><span className="val" style={{color:'#4ade80'}}>EGP {parseFloat(totalCommissions).toLocaleString('en-US',{minimumFractionDigits:2})}</span><span className="lbl">Total Earned</span></div>
+        <div className="admin-stat"><span className="val">{totalItems}</span><span className="lbl">Paid Orders</span></div>
+      </div>
+      <table className="admin-table"><thead><tr><th>Order</th><th>Seller</th><th>Value</th><th>Rate</th><th>Commission</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>{items.map((o) => <tr key={o.id}><td>#{o.id}</td><td>{o.seller?.fullName||'N/A'}</td><td>EGP {parseFloat(o.totalPrice).toFixed(2)}</td>
+          <td><span className="badge badge-approved">{o.commissionRate}</span></td><td style={{color:'#4ade80',fontWeight:600}}>EGP {parseFloat(o.commissionAmount).toFixed(2)}</td>
+          <td><span className={`badge badge-${o.orderStatus==='delivered'?'approved':'pending_review'}`}>{o.orderStatus}</span></td><td>{new Date(o.createdAt).toLocaleDateString()}</td></tr>)}</tbody></table>
+      <Pagination page={page} totalPages={totalPages} onPageChange={load} />
+    </AdminShell>
+  );
+}

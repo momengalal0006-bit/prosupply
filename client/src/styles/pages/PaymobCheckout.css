@@ -1,0 +1,300 @@
+/* ══════════════════════════════════════════════════════════
+   PaymobCheckout — Embedded Payment Component Styles
+   ══════════════════════════════════════════════════════════
+   Matches the ProSupply design system:
+     • Navy-dark panels with cyan accent borders
+     • Inter font family
+     • Smooth micro-animations
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Container ───────────────────────────────────────────── */
+.paymob-checkout {
+  max-width: 560px;
+  margin: 2rem auto;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── Header card ─────────────────────────────────────────── */
+.paymob-header {
+  background: var(--navy-dark, #0B1121);
+  border: 2px solid var(--cyan-bright, #00E5FF);
+  border-radius: 20px;
+  padding: 2rem 2.2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 24px rgba(0, 229, 255, 0.12);
+  text-align: center;
+}
+
+.paymob-header h2 {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.paymob-header p {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.88rem;
+}
+
+/* ── Amount display ──────────────────────────────────────── */
+.paymob-amount-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.35rem;
+  margin: 1.2rem 0 0.2rem;
+}
+
+.paymob-amount-value {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--cyan-bright, #00E5FF);
+  line-height: 1;
+}
+
+.paymob-amount-currency {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+/* ── Pay button ──────────────────────────────────────────── */
+.paymob-pay-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #00E5FF 0%, #0091EA 100%);
+  color: #0B1121;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 18px rgba(0, 229, 255, 0.3);
+  letter-spacing: 0.2px;
+}
+
+.paymob-pay-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 229, 255, 0.45);
+}
+
+.paymob-pay-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.paymob-pay-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.paymob-pay-btn svg {
+  flex-shrink: 0;
+}
+
+/* ── Loading state ───────────────────────────────────────── */
+.paymob-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  gap: 1.2rem;
+}
+
+.paymob-spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid rgba(0, 229, 255, 0.15);
+  border-top-color: var(--cyan-bright, #00E5FF);
+  border-radius: 50%;
+  animation: paymob-spin 0.8s linear infinite;
+}
+
+@keyframes paymob-spin {
+  to { transform: rotate(360deg); }
+}
+
+.paymob-loading p {
+  color: var(--text-muted, #64748B);
+  font-size: 0.92rem;
+  font-weight: 500;
+  animation: paymob-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes paymob-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* ── Pixel container (the embedded Paymob form) ──────────── */
+.paymob-pixel-wrapper {
+  background: #ffffff;
+  border: 2px solid var(--border-color, #E2E8F0);
+  border-radius: 20px;
+  padding: 1.8rem;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  animation: paymob-fadeIn 0.5s ease-out;
+}
+
+.paymob-pixel-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted, #64748B);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--border-color, #E2E8F0);
+}
+
+#paymob-container {
+  min-height: 200px;
+}
+
+@keyframes paymob-fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Status messages (success / error) ───────────────────── */
+.paymob-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  text-align: center;
+  animation: paymob-fadeIn 0.5s ease-out;
+}
+
+.paymob-status-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  animation: paymob-bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes paymob-bounceIn {
+  0%   { transform: scale(0); }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Success */
+.paymob-status.success {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 2px solid #86efac;
+}
+
+.paymob-status.success .paymob-status-icon {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+.paymob-status.success h3 {
+  color: #15803d;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.paymob-status.success p {
+  color: #166534;
+  font-size: 0.9rem;
+}
+
+/* Error */
+.paymob-status.error {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border: 2px solid #fca5a5;
+}
+
+.paymob-status.error .paymob-status-icon {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.paymob-status.error h3 {
+  color: #b91c1c;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.paymob-status.error p {
+  color: #991b1b;
+  font-size: 0.9rem;
+}
+
+/* ── Retry / Back button ─────────────────────────────────── */
+.paymob-retry-btn {
+  margin-top: 0.5rem;
+  padding: 0.7rem 1.8rem;
+  border: 2px solid var(--border-color, #E2E8F0);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--text-main, #1f2b3e);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.paymob-retry-btn:hover {
+  border-color: var(--cyan-bright, #00E5FF);
+  background: var(--bg-light, #F8FAFC);
+}
+
+/* ── Security footer note ────────────────────────────────── */
+.paymob-security-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 1.2rem;
+  font-size: 0.76rem;
+  color: var(--text-muted, #64748B);
+  opacity: 0.7;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .paymob-checkout {
+    margin: 1rem;
+  }
+
+  .paymob-header {
+    padding: 1.5rem 1.2rem;
+    border-radius: 16px;
+  }
+
+  .paymob-amount-value {
+    font-size: 2.2rem;
+  }
+
+  .paymob-pixel-wrapper {
+    padding: 1.2rem;
+    border-radius: 16px;
+  }
+}

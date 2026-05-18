@@ -1,0 +1,40 @@
+.orders-page { max-width: 900px; margin: 0 auto; padding: 2rem 2rem 3rem; min-height: 60vh; }
+.orders-heading { font-size: 2rem; font-weight: 800; color: var(--navy-dark); }
+.orders-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.orders-list { display: flex; flex-direction: column; gap: 1rem; }
+.btn-clear-all { padding: 0.6rem 1.2rem; background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; }
+.btn-clear-all:hover { background: rgba(239,68,68,0.2); border-color: #ef4444; transform: translateY(-1px); }
+.order-card { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1.5rem; padding: 1.5rem; background: white; border: 1px solid var(--border-color); border-radius: 16px; cursor: pointer; transition: all 0.3s; text-decoration: none; color: inherit; }
+.order-card:hover { border-color: var(--accent-amber); box-shadow: 0 8px 24px rgba(0,0,0,0.06); transform: translateY(-2px); }
+.order-info { display: flex; flex-direction: column; gap: 0.4rem; }
+.order-title { font-weight: 700; font-size: 1.05rem; color: var(--navy-dark); }
+.order-meta { font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 1rem; flex-wrap: wrap; }
+.order-total { font-weight: 800; font-size: 1.2rem; color: var(--accent-amber); }
+.order-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.order-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
+
+/* Grouped order card */
+.order-group-card { background: white; border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; transition: all 0.3s; }
+.order-group-card:hover { border-color: var(--accent-amber); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+.order-group-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; background: var(--bg-light); border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 0.5rem; }
+.order-group-title { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.95rem; color: var(--navy-dark); }
+.order-group-icon { font-size: 1.2rem; }
+.order-group-meta { display: flex; align-items: center; gap: 1rem; font-size: 0.85rem; color: var(--text-muted); }
+.order-group-total { font-weight: 800; color: var(--accent-amber); font-size: 1rem; }
+.order-group-items { display: flex; flex-direction: column; }
+.order-group-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); text-decoration: none; color: inherit; transition: background 0.2s; gap: 1rem; }
+.order-group-item:last-child { border-bottom: none; }
+.order-group-item:hover { background: var(--bg-light); }
+.empty-state { text-align: center; padding: 4rem 2rem; }
+.empty-state h2 { color: var(--text-main); margin-bottom: 1rem; }
+.empty-state a { color: var(--cyan-bright); font-weight: 700; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(11,17,33,0.85); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 3000; opacity: 0; visibility: hidden; transition: 0.3s; }
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal-card-light { background: white; padding: 2rem; max-width: 400px; width: 90%; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); text-align: center; }
+.modal-card-light h2 { color: var(--navy-dark); margin-bottom: 1rem; font-size: 1.35rem; }
+.modal-card-light p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+.modal-actions { display: flex; gap: 1rem; justify-content: center; }
+.btn-submit-red { padding: 0.75rem 1.5rem; background: #ef4444; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+.btn-submit-red:hover { background: #dc2626; transform: translateY(-2px); }
+.btn-cancel { padding: 0.75rem 1.5rem; background: var(--bg-light); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+.btn-cancel:hover { background: #e2e8f0; }

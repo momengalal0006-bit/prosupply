@@ -1,0 +1,11 @@
+.order-detail-page { max-width: 700px; margin: 0 auto; padding: 2rem 2rem 3rem; min-height: 60vh; }
+.order-detail-card { background: white; border: 1px solid var(--border-color); border-radius: 20px; padding: 2rem; }
+.order-detail-card h1 { font-size: 1.5rem; font-weight: 800; color: var(--navy-dark); margin-bottom: 1.5rem; }
+.detail-row { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.95rem; }
+.detail-row .label { color: var(--text-muted); }
+.detail-row .value { font-weight: 600; color: var(--text-main); }
+.detail-total { font-size: 1.3rem; font-weight: 800; color: var(--accent-amber); border-bottom: none; padding-top: 1rem; }
+.btn-rate { display: inline-block; margin-top: 1.5rem; padding: 0.8rem 2rem; background: var(--navy-dark); color: var(--cyan-bright); border-radius: 12px; font-weight: 700; text-decoration: none; transition: all 0.3s; }
+.btn-rate:hover { background: #1e293b; transform: translateY(-2px); }
+.back-link { display: inline-block; margin-bottom: 1.5rem; color: var(--accent-amber); font-weight: 600; text-decoration: none; }
+.back-link:hover { text-decoration: underline; }

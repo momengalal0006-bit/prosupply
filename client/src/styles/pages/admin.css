@@ -1,0 +1,68 @@
+.admin-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; background: #0a1224; color: white; font-family: 'Inter', sans-serif; }
+.admin-sidebar { padding: 1.5rem; border-right: 1px solid rgba(255,255,255,0.08); }
+.admin-logo-link { display: block; margin-bottom: 0.5rem; }
+.admin-logo-img { height: 50px; width: auto; object-fit: contain; display: block; transition: transform 0.3s, filter 0.3s; }
+.admin-logo-img:hover { transform: scale(1.05); filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.5)); }
+.admin-sidebar h2 { color: var(--cyan-bright); font-size: 1.2rem; margin-bottom: 0.5rem; }
+.admin-sidebar h2 a { text-decoration: none; color: inherit; }
+.admin-sidebar p { color: rgba(255,255,255,0.4); font-size: 0.75rem; margin-bottom: 2rem; }
+.admin-nav { display: flex; flex-direction: column; gap: 0.4rem; }
+.admin-nav a { padding: 0.75rem 1rem; border-radius: 10px; font-weight: 600; font-size: 0.88rem; transition: all 0.3s; color: #CBD5E1; text-decoration: none; }
+.admin-nav a:hover { background: rgba(0,229,255,0.08); }
+.admin-nav a.active { background: rgba(0,229,255,0.15); color: var(--cyan-bright); }
+.admin-main { padding: 2rem 2.5rem; }
+.admin-main h1 { font-size: 1.8rem; font-weight: 800; color: var(--cyan-bright); margin-bottom: 1.5rem; }
+.admin-topbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.2rem; }
+.admin-topbar h1 { margin-bottom: 0; }
+.admin-logout { padding: 0.55rem 0.95rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.22); background: rgba(255,255,255,0.04); color: #fff; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; }
+.admin-logout:hover { border-color: var(--cyan-bright); color: var(--cyan-bright); }
+.admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.admin-stat { padding: 1.5rem; border: 2px solid var(--cyan-bright); border-radius: 20px; background: var(--navy-dark); box-shadow: 0 0 20px rgba(0, 229, 255, 0.15); text-align: center; }
+.admin-stat .val { font-size: 2.2rem; font-weight: 800; color: var(--cyan-bright); display: block; }
+.admin-stat .lbl { font-size: 0.78rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0.3rem; }
+.search-bar { width: 100%; padding: 0.85rem 1.25rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; color: white; font-family: inherit; font-size: 0.95rem; margin-bottom: 1.5rem; transition: border-color 0.3s; outline: none; }
+.search-bar:focus { border-color: var(--cyan-bright); }
+.search-bar::placeholder { color: rgba(255,255,255,0.35); }
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th { text-align: left; padding: 0.75rem 1rem; font-size: 0.72rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.admin-table td { padding: 0.75rem 1rem; font-size: 0.88rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.admin-table tr:hover { background: rgba(0,229,255,0.03); }
+.admin-table a { color: var(--cyan-bright); text-decoration: underline; }
+.admin-card { border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 1rem; background: rgba(255,255,255,0.03); }
+.admin-card h2 { color: rgba(255,255,255,0.9); font-size: 1rem; margin-bottom: 0.8rem; }
+.action-btn { padding: 0.35rem 0.7rem; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; margin-right: 0.3rem; }
+.btn-ban { background: rgba(239,68,68,0.15); color: #ef4444; }
+.btn-ban:hover { background: rgba(239,68,68,0.3); }
+.btn-unban { background: rgba(34,197,94,0.15); color: #22c55e; }
+.btn-unban:hover { background: rgba(34,197,94,0.3); }
+.btn-delete { background: rgba(239,68,68,0.15); color: #ef4444; }
+.btn-delete:hover { background: rgba(239,68,68,0.3); }
+.btn-approve { background: rgba(34,197,94,0.15); color: #22c55e; }
+.btn-approve:hover { background: rgba(34,197,94,0.3); }
+.btn-reject { background: rgba(239,68,68,0.15); color: #ef4444; }
+.btn-reject:hover { background: rgba(239,68,68,0.3); }
+.filter-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; }
+.filter-tab { padding: 0.5rem 1.2rem; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; color: #CBD5E1; }
+.filter-tab.active { background: rgba(0,229,255,0.15); border-color: var(--cyan-bright); color: var(--cyan-bright); }
+.filter-tab:hover { border-color: rgba(0,229,255,0.4); }
+.confirm-overlay { position: fixed; inset: 0; background: rgba(4,9,20,0.9); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 3000; opacity: 0; visibility: hidden; transition: 0.3s; }
+.confirm-overlay.active { opacity: 1; visibility: visible; }
+.confirm-card { padding: 2rem; max-width: 400px; width: 90%; text-align: center; }
+.confirm-card h3 { color: var(--cyan-bright); margin-bottom: 1rem; }
+.confirm-card p { color: rgba(255,255,255,0.7); margin-bottom: 1.5rem; font-size: 0.9rem; }
+.confirm-actions { display: flex; gap: 0.75rem; justify-content: center; }
+.confirm-actions button { padding: 0.65rem 1.5rem; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-size: 0.88rem; }
+.confirm-yes { background: #ef4444; color: white; }
+.confirm-no { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.2) !important; }
+/* Admin pagination override for dark theme */
+.admin-main .pagination .pg-btn { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15); color: white; }
+.admin-main .pagination .pg-btn:hover:not(:disabled) { border-color: var(--cyan-bright); background: rgba(0,229,255,0.1); }
+.admin-main .pagination .pg-active { background: rgba(0,229,255,0.2); color: var(--cyan-bright); border-color: var(--cyan-bright); }
+
+@media (max-width: 768px) {
+  .admin-layout { grid-template-columns: 1fr; }
+  .admin-sidebar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .admin-nav { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 0.5rem; width: 100%; }
+  .admin-table td { white-space: normal !important; }
+  .action-btn { display: block; width: 100%; margin-bottom: 0.4rem; margin-right: 0; }
+}

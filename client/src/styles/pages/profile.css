@@ -1,0 +1,45 @@
+.profile-page-wrapper { min-height: 100vh; background: var(--bg-light); }
+.top-nav-simple { background: var(--navy-dark); padding: 1.5rem; display: flex; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+.brand-logo { display: flex; align-items: center; gap: 0.6rem; }
+.brand-logo a { text-decoration: none; color: inherit; }
+.profile-container { max-width: 1100px; margin: 4rem auto; display: grid; grid-template-columns: 280px 1fr; gap: 2.5rem; padding: 0 2rem; }
+.profile-sidebar { border-radius: 20px; padding: 2.5rem 1.5rem; text-align: center; height: fit-content; }
+.avatar { font-size: 2.5rem; background: rgba(255,255,255,0.05); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; border: 2px solid var(--cyan-bright); }
+.sidebar-user h3 { font-size: 1.2rem; margin-bottom: 0.3rem; color: white; }
+.sidebar-user p { color: #A0aec0; font-size: 0.85rem; margin-bottom: 1rem; }
+.profile-badge { background: var(--cyan-bright); color: var(--navy-dark); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+.sidebar-nav { margin-top: 2rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.nav-item { display: flex; align-items: center; gap: 12px; padding: 1rem; color: #A0aec0; text-decoration: none; font-weight: 600; border-radius: 12px; transition: 0.3s; }
+.nav-item:hover { background: rgba(0,229,255,0.05); color: white; }
+.nav-item.active { background: var(--cyan-bright); color: var(--navy-dark); }
+.profile-content { border-radius: 24px; padding: 3rem; }
+.content-section { animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; border-bottom: 1px solid rgba(0,229,255,0.2); padding-bottom: 1.5rem; }
+.content-header h2 { color: var(--cyan-bright); font-size: 1.6rem; }
+.edit-toggle-btn { background: transparent; border: 1.5px solid var(--cyan-bright); color: var(--cyan-bright); padding: 0.6rem 1.2rem; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+.edit-toggle-btn:hover, .edit-toggle-btn.editing { background: var(--cyan-bright); color: var(--navy-dark); }
+.profile-form { display: flex; flex-direction: column; gap: 1.8rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #A0aec0; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-group input, .form-group textarea { width: 100%; padding: 1rem 1.2rem; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(0,229,255,0.2); border-radius: 12px; color: white; font-size: 1rem; font-family: 'Inter', sans-serif; transition: 0.3s; outline: none; resize: none; }
+.form-group input[readonly], .form-group textarea[readonly] { cursor: not-allowed; opacity: 0.6; border-color: transparent; }
+.form-group input:not([readonly]):focus, .form-group textarea:not([readonly]):focus { border-color: var(--cyan-bright); background: rgba(0,229,255,0.03); }
+.form-actions { display: flex; }
+.save-btn { background: var(--cyan-bright); color: var(--navy-dark); border: none; padding: 1rem 2.5rem; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+.save-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,229,255,0.4); }
+.code-input { text-align: center; letter-spacing: 10px; font-weight: 800; font-size: 1.2rem !important; }
+.pass-wrapper { position: relative; display: flex; align-items: center; }
+.pass-wrapper input { padding-right: 45px !important; }
+.toggle-pass { position: absolute; right: 15px; cursor: pointer; font-size: 1.1rem; }
+.error-msg { color: #ff4d4d; font-size: 0.85rem; }
+.address-empty-state { display: flex; flex-direction: column; align-items: center; padding: 2rem; text-align: center; color: #A0aec0; gap: 0.5rem; }
+.address-empty-state .empty-icon { font-size: 2.5rem; }
+.address-empty-state p { font-size: 1rem; font-weight: 600; color: #CBD5E1; }
+.address-empty-state small { font-size: 0.85rem; color: #64748B; }
+
+@media (max-width: 768px) {
+  .profile-container { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .sidebar-nav { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+}

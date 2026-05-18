@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+client/node_modules/
+
+# Environment variables (contains secrets!)
+.env
+.env.local
+.env.production
+.env.mobile
+client/.env
+client/.env.mobile
+
+# Build output
+client/dist/
+
+# Uploaded files
+uploads/
+
+# Backup files
+*.zip
+
+# Cookie/session files
+*.cookies.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Empty directories
+imp/
+new/
