@@ -1,15 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../services/api';
 import { normalizeImageUrl, starsArray } from '../../utils/helpers';
+import { useAuth } from '../../hooks/useAuth';
 import '../../styles/pages/recommended.css';
 
 const PLACEHOLDER = 'https://placehold.co/300x300/e2e8f0/1f2b3e?text=Product';
 
 export default function RecommendedSection() {
+  const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollRef = useRef(null);
+  const navigate = useNavigate();
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
@@ -31,7 +34,7 @@ export default function RecommendedSection() {
     load();
   }, []);
 
-  // Update scroll arrow visibility
+  
   const updateScrollState = () => {
     const el = scrollRef.current;
     if (!el) return;
@@ -42,7 +45,7 @@ export default function RecommendedSection() {
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    // Initial check after products render
+    
     const timer = setTimeout(updateScrollState, 100);
     el.addEventListener('scroll', updateScrollState, { passive: true });
     window.addEventListener('resize', updateScrollState);
@@ -61,7 +64,7 @@ export default function RecommendedSection() {
     el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
   };
 
-  // Don't render the section at all if no products
+  
   if (!loading && products.length === 0) return null;
 
   return (
@@ -91,7 +94,7 @@ export default function RecommendedSection() {
         </div>
       ) : (
         <div className="rec-carousel-wrapper">
-          {/* Left arrow */}
+          
           <button
             className={`rec-arrow rec-arrow-left ${canScrollLeft ? 'visible' : ''}`}
             onClick={() => scroll('left')}
@@ -102,7 +105,7 @@ export default function RecommendedSection() {
             </svg>
           </button>
 
-          {/* Scrollable track */}
+          
           <div className="rec-scroll" ref={scrollRef}>
             {products.map((ad) => {
               const imgSrc = ad.images?.length > 0
@@ -133,7 +136,17 @@ export default function RecommendedSection() {
                       ))}
                     </div>
                     <span className="rec-card-seller">
-                      {sellerName}
+                      <span
+                        className={`seller-name-link${user?.id === ad.seller?.id ? ' disabled' : ''}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (user?.id === ad.seller?.id) return;
+                          navigate(`/seller/${ad.seller?.id}`);
+                        }}
+                      >
+                        {sellerName}
+                      </span>
                       <span className="rec-mini-star">★</span>
                       {sellerRatingVal}
                       {ad.seller?.trustScore != null && (() => {
@@ -150,7 +163,7 @@ export default function RecommendedSection() {
             })}
           </div>
 
-          {/* Right arrow */}
+          
           <button
             className={`rec-arrow rec-arrow-right ${canScrollRight ? 'visible' : ''}`}
             onClick={() => scroll('right')}

@@ -7,7 +7,6 @@ const getCart = async (userId) => {
 
   for (const item of items) {
     if (!item.Ad || item.Ad.status === 'deleted') {
-      // Silently remove deleted ads from cart
       await item.destroy();
       continue;
     }
@@ -37,13 +36,11 @@ const getCartSummary = async (userId) => {
 };
 
 const addToCart = async (userId, { adId, quantity }) => {
-  // Check duplicate
   const existing = await cartRepo.findItem(userId, adId);
   if (existing) {
     throw Object.assign(new Error('Item already in cart.'), { statusCode: 409, code: 'ALREADY_IN_CART' });
   }
 
-  // Validate ad
   const ad = await Ad.findByPk(adId);
   if (!ad || ad.status !== 'active') {
     throw Object.assign(new Error('Ad not found or not available.'), { statusCode: 404 });
@@ -59,7 +56,6 @@ const addToCart = async (userId, { adId, quantity }) => {
 };
 
 const updateCartItem = async (userId, adId, quantity) => {
-  // Validate quantity
   const ad = await Ad.findByPk(adId);
   if (ad && quantity > ad.quantity) {
     throw Object.assign(new Error('Insufficient stock.'), { statusCode: 400, code: 'INSUFFICIENT_STOCK' });

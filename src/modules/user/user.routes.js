@@ -4,10 +4,10 @@ const { authenticate } = require('../../middleware/auth.middleware');
 const { authorize } = require('../../middleware/rbac.middleware');
 const { validateUpdateRole, handleValidation } = require('../auth/auth.validator');
 
-// Any authenticated user
+
 router.get('/me', authenticate, ctrl.getMe);
 
-// Admin-only routes
+
 router.get('/', authenticate, authorize('admin'), ctrl.getAllUsers);
 router.get('/:id', authenticate, authorize('admin'), ctrl.getUserById);
 router.patch('/:id/role', authenticate, authorize('admin'), validateUpdateRole, handleValidation, ctrl.updateUserRole);

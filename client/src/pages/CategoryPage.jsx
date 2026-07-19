@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { API } from '../services/api';
 import { normalizeImageUrl, starsArray } from '../utils/helpers';
+import { useAuth } from '../hooks/useAuth';
 import StarSelector from '../components/common/StarSelector';
 import Spinner from '../components/common/Spinner';
 import '../styles/pages/category.css';
@@ -27,6 +28,8 @@ const SEARCH_PLACEHOLDER_MAP = {
 };
 
 export default function CategoryPage({ category }) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [initialLoading, setInitialLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -89,7 +92,7 @@ export default function CategoryPage({ category }) {
     }
   }, [category, search, priceMin, priceMax, origin, brand, brands, productRating, sellerRating]);
 
-  // Single debounced effect — instant on first load, debounced on filter changes.
+  
   useEffect(() => {
     if (initialLoadRef.current) {
       initialLoadRef.current = false;
@@ -100,7 +103,7 @@ export default function CategoryPage({ category }) {
     return () => clearTimeout(timer);
   }, [loadProducts]);
 
-  // Price slider fill
+  
   const pctLo = (priceMin / 500000) * 100;
   const pctHi = (priceMax / 500000) * 100;
   const selectedCount = comparisonProducts.length;
@@ -149,7 +152,7 @@ export default function CategoryPage({ category }) {
 
   return (
     <>
-      {/* Hero / Search */}
+      
       <section className="hero">
         <div className="hero-inner">
           <div className="search-wrapper">
@@ -168,9 +171,9 @@ export default function CategoryPage({ category }) {
             </button>
           </div>
 
-          {/* Filters */}
+          
           <div className="filter-bar">
-            {/* Price Range */}
+            
             <div className="filter-pill">
               <span className="filter-label">Price Range</span>
               <div className="price-slider-track">
@@ -187,7 +190,7 @@ export default function CategoryPage({ category }) {
               </div>
             </div>
 
-            {/* Origin */}
+            
             <div className="filter-pill">
               <span className="filter-label">Origin</span>
               <select className="filter-select" value={origin} onChange={(e) => setOrigin(e.target.value)}>
@@ -196,7 +199,7 @@ export default function CategoryPage({ category }) {
               </select>
             </div>
 
-            {/* Brand */}
+            
             <div className="filter-pill">
               <span className="filter-label">{category === 'Heavy Machinery' ? 'Equipment Brand' : 'Car Brand'}</span>
               <select className="filter-select" value={brand} onChange={(e) => setBrand(e.target.value)}>
@@ -205,13 +208,13 @@ export default function CategoryPage({ category }) {
               </select>
             </div>
 
-            {/* Product Rating */}
+            
             <div className="filter-pill">
               <span className="filter-label">Product Rating</span>
               <StarSelector value={productRating} onChange={(v) => setProductRating(v)} />
             </div>
 
-            {/* Seller Rating */}
+            
             <div className="filter-pill">
               <span className="filter-label">Seller Rating</span>
               <StarSelector value={sellerRating} onChange={(v) => setSellerRating(v)} />
@@ -220,7 +223,7 @@ export default function CategoryPage({ category }) {
         </div>
       </section>
 
-      {/* Products Grid */}
+      
       <main className="products-section">
         {selectedCount > 0 && (
           <div className="compare-toolbar">
@@ -291,7 +294,18 @@ export default function CategoryPage({ category }) {
                         ))}
                       </div>
                       <span className="seller-badge">
-                        {sellerName} <span className="mini-star">★</span> {sellerRatingVal}
+                          <span
+                            className={`seller-name-link${user?.id === ad.seller?.id ? ' disabled' : ''}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (user?.id === ad.seller?.id) return;
+                              navigate(`/seller/${ad.seller?.id}`);
+                            }}
+                          >
+                            {sellerName}
+                          </span>
+                          {' '}<span className="mini-star">★</span> {sellerRatingVal}
                         {ad.seller?.trustScore != null && (() => {
                           const ts = parseFloat(ad.seller.trustScore);
                           let label, cls;

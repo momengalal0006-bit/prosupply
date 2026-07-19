@@ -1,8 +1,4 @@
-/**
- * Migration: Add delivery address fields to users and orders tables.
- *
- * Run once:  node migrations/add-delivery-address.js
- */
+
 const path = require('path');
 require('dotenv').config({
   path: path.resolve(__dirname, '../Graduation project auth/prosupply-auth/.env'),
@@ -20,7 +16,7 @@ const sequelize = require(path.resolve(
 
     const qi = sequelize.getQueryInterface();
 
-    // ── Users table: delivery address fields ────────────────────
+    
     const userCols = await qi.describeTable('users');
 
     if (!userCols.deliveryStreet) {
@@ -71,7 +67,7 @@ const sequelize = require(path.resolve(
       console.log('  + users.deliveryNotes');
     }
 
-    // ── Orders table: snapshot the delivery address used ────────
+    
     const orderCols = await qi.describeTable('orders');
 
     if (!orderCols.deliveryAddress) {

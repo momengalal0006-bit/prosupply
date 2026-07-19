@@ -9,14 +9,14 @@ export function ToastProvider({ children }) {
     const id = Date.now() + Math.random();
     setToasts((prev) => [...prev, { id, message, isError, show: false }]);
 
-    // Trigger show animation
+    
     setTimeout(() => {
       setToasts((prev) =>
         prev.map((t) => (t.id === id ? { ...t, show: true } : t))
       );
     }, 50);
 
-    // Auto-remove after 4s
+    
     setTimeout(() => {
       setToasts((prev) =>
         prev.map((t) => (t.id === id ? { ...t, show: false } : t))

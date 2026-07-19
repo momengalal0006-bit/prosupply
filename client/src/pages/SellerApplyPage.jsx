@@ -7,7 +7,7 @@ import '../styles/pages/seller-apply.css';
 export default function SellerApplyPage() {
   const showToast = useToast();
   const navigate = useNavigate();
-  const [status, setStatus] = useState('none'); // none | pending_review | rejected
+  const [status, setStatus] = useState('none'); 
   const [businessName, setBusinessName] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [fileNames, setFileNames] = useState('');

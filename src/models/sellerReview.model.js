@@ -1,5 +1,4 @@
 const { DataTypes } = require('sequelize');
-const path = require('path');
 const sequelize = require('../config/database');
 
 const SellerReview = sequelize.define('SellerReview', {

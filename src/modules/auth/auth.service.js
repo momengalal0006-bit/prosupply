@@ -6,11 +6,7 @@ const { sendPasswordResetEmail } = require('../../utils/email.utils');
 
 const SALT_ROUNDS = 12;
 
-/**
- * Register a new user.
- */
 const register = async ({ fullName, email, phone, password }) => {
-  // Check uniqueness
   const existingEmail = await User.findOne({ where: { email: email.toLowerCase() } });
   if (existingEmail) {
     const err = new Error('Email is already registered.');
@@ -46,9 +42,6 @@ const register = async ({ fullName, email, phone, password }) => {
   return { user, accessToken, refreshToken };
 };
 
-/**
- * Login an existing user.
- */
 const login = async ({ email, password }) => {
   const user = await User.findOne({ where: { email: email.toLowerCase() } });
   if (!user) {
@@ -82,16 +75,10 @@ const login = async ({ email, password }) => {
   return { user, accessToken, refreshToken };
 };
 
-/**
- * Logout — clear refresh token in DB.
- */
 const logout = async (userId) => {
   await User.update({ refreshToken: null }, { where: { id: userId } });
 };
 
-/**
- * Refresh the access token using a valid refresh token.
- */
 const refreshAccessToken = async (userId, storedToken) => {
   const user = await User.findByPk(userId);
   if (!user || user.refreshToken !== storedToken) {
@@ -105,14 +92,10 @@ const refreshAccessToken = async (userId, storedToken) => {
   return { accessToken };
 };
 
-/**
- * Forgot password — generate OTP, hash it, email it.
- */
 const forgotPassword = async (email) => {
   const user = await User.findOne({ where: { email: email.toLowerCase() } });
-  if (!user) return; // silent — prevent enumeration
+  if (!user) return;
 
-  // Generate 6-digit numeric OTP
   const otp = crypto.randomInt(100000, 999999).toString();
 
   const hashedOtp = await bcrypt.hash(otp, SALT_ROUNDS);
@@ -125,9 +108,6 @@ const forgotPassword = async (email) => {
   await sendPasswordResetEmail(user.email, user.fullName, otp);
 };
 
-/**
- * Reset password using email + OTP + new password.
- */
 const resetPassword = async ({ email, otp, newPassword }) => {
   const user = await User.findOne({ where: { email: email.toLowerCase() } });
   if (!user) {

@@ -6,7 +6,7 @@ require('dotenv').config({
 const bcrypt = require('bcryptjs');
 const sequelize = require('../src/config/database');
 
-// Import models to register associations
+
 require('../src/models/index');
 const { User } = require('../src/models/user.model');
 

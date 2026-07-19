@@ -21,11 +21,9 @@ const alternatives = async (req, res, next) => {
 
 const personal = async (req, res, next) => {
   try {
-    // Works for both logged-in and anonymous users
     const userId = req.user?.id;
     const limit = parseInt(req.query.limit) || 10;
     if (!userId) {
-      // Return top rated products for anonymous users
       const { Ad } = require('../../models/ad.model');
       const { User } = require('../../models/user.model');
       const products = await Ad.findAll({

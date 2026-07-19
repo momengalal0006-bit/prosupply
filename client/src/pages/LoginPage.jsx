@@ -100,7 +100,7 @@ export default function LoginPage() {
     );
   }
 
-  /* Logged-in buyers/sellers go home; admins may stay here to sign in (e.g. after logout or another account). */
+  
   if (user && !isAdmin) {
     return <Navigate to="/" replace />;
   }
@@ -165,7 +165,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Forgot Password Modal */}
+      
       {forgotModal && (
         <div className="modal-overlay show">
           <div className="modal-content">
@@ -189,7 +189,7 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Reset Password Modal */}
+      
       {resetModal && (
         <div className="modal-overlay show">
           <div className="modal-content">

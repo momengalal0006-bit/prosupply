@@ -5,7 +5,6 @@ const { authenticate } = require('../../middleware/auth.middleware');
 const { validate } = require('../../middleware/validate.middleware');
 const { validateAddToCart, validateUpdateCart } = require('./cart.validation');
 
-// Register /summary before /:adId
 router.get('/', authenticate, cartController.getCart);
 router.get('/summary', authenticate, cartController.getSummary);
 router.post('/', authenticate, validateAddToCart, validate, cartController.addItem);

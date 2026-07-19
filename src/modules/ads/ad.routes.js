@@ -9,7 +9,6 @@ const { validate } = require('../../middleware/validate.middleware');
 const { validateCreateAd, validateUpdateAd } = require('./ad.validation');
 const { uploadImages } = require('../../config/multer');
 
-// Public routes
 router.get('/', adController.getAll);
 router.get('/compare', adController.compare);
 router.get('/recommendations/personal', optionalAuth, recommendationController.personal);
@@ -18,7 +17,6 @@ router.get('/:id', adController.getById);
 router.get('/:id/similar', recommendationController.similar);
 router.get('/:id/alternatives', recommendationController.alternatives);
 
-// Seller routes
 router.post('/', authenticate, isSeller, uploadImages.array('images', 10), validateCreateAd, validate, adController.create);
 router.get('/:id/edit', authenticate, isSeller, adController.getForEdit);
 router.put('/:id', authenticate, isSeller, uploadImages.array('images', 10), validateUpdateAd, validate, adController.update);

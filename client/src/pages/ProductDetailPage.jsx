@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { apiFetch, apiPost } from '../services/api';
 import { normalizeImageUrl, starsArray, formatPrice } from '../utils/helpers';
 import { useToast } from '../hooks/useToast';
@@ -20,6 +20,8 @@ function TrustBadge({ score }) {
 }
 
 function RecommendationCard({ ad, placeholder }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const imgSrc = ad.images?.length > 0 ? normalizeImageUrl(ad.images[0]) : placeholder;
   const stars = starsArray(ad.avgRating || 0);
   return (
@@ -35,7 +37,17 @@ function RecommendationCard({ ad, placeholder }) {
         </div>
         {ad.seller && (
           <span className="rec-card-seller">
-            {ad.seller.fullName}
+            <span
+              className={`seller-name-link${user?.id === ad.seller.id ? ' disabled' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (user?.id === ad.seller.id) return;
+                navigate(`/seller/${ad.seller.id}`);
+              }}
+            >
+              {ad.seller.fullName}
+            </span>
             <TrustBadge score={ad.seller.trustScore} />
           </span>
         )}
@@ -46,6 +58,7 @@ function RecommendationCard({ ad, placeholder }) {
 
 export default function ProductDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const showToast = useToast();
   const { refreshCartBadge, user } = useAuth();
   const [product, setProduct] = useState(null);
@@ -65,7 +78,7 @@ export default function ProductDetailPage() {
   useEffect(() => {
     let cancelled = false;
 
-    // Clear old product data and show spinner when navigating to a new product ID
+    
     setProduct(null);
     setLoading(true);
     setQuantity(1);
@@ -86,7 +99,7 @@ export default function ProductDetailPage() {
       }
       setLoading(false);
 
-      // Load recommendations in background
+      
       const [simRes, altRes] = await Promise.all([
         apiFetch(`/api/ads/${id}/similar?limit=6`),
         apiFetch(`/api/ads/${id}/alternatives?limit=4`),
@@ -100,7 +113,7 @@ export default function ProductDetailPage() {
     return () => { cancelled = true; };
   }, [id]);
 
-  // Silent refresh — no spinner, just updates product data (used after review submission)
+  
   async function refreshProduct() {
     const res = await apiFetch(`/api/ads/${id}`);
     if (res && res.success) {
@@ -197,7 +210,7 @@ export default function ProductDetailPage() {
   return (
     <main className="product-detail-page">
       <div className="product-detail-grid">
-        {/* Gallery */}
+        
         <div className="product-gallery">
           <div className="main-image-wrap">
             <img src={mainImage} alt={ad.title} className="main-image" />
@@ -217,7 +230,7 @@ export default function ProductDetailPage() {
           )}
         </div>
 
-        {/* Info */}
+        
         <div className="product-detail-info">
           <h1 className="pd-title">{ad.title}</h1>
           <div className="pd-price">{formatPrice(ad.price)}</div>
@@ -230,12 +243,25 @@ export default function ProductDetailPage() {
           </div>
 
           <div className="pd-seller">
-            <span>Sold by <strong>{sellerName}</strong></span>
+            <span>
+              Sold by{' '}
+              <span
+                className={`seller-name-link${user?.id === ad.sellerId ? ' disabled' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (user?.id === ad.sellerId) return;
+                  navigate(`/seller/${ad.sellerId}`);
+                }}
+              >
+                {sellerName}
+              </span>
+            </span>
             <span className="pd-seller-rating">★ {sellerRating}</span>
             <TrustBadge score={ad.seller?.trustScore} />
           </div>
 
-          {/* Specs */}
+          
           <div className="pd-specs">
             {ad.brand && <div className="spec-row"><span className="spec-label">Brand</span><span className="spec-value">{ad.brand}</span></div>}
             {ad.category && <div className="spec-row"><span className="spec-label">Category</span><span className="spec-value">{ad.category}</span></div>}
@@ -246,7 +272,7 @@ export default function ProductDetailPage() {
 
           {ad.description && <p className="pd-description">{ad.description}</p>}
 
-          {/* Add to Cart */}
+          
           {inStock && (
             <div className="pd-cart-action">
               <div className="qty-stepper">
@@ -262,7 +288,7 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
-      {/* AI Recommendations — Similar Products */}
+      
       {similarProducts.length > 0 && (
         <section className="rec-section">
           <h2 className="rec-heading">🎯 Similar Products <span className="ai-tag">AI Powered</span></h2>
@@ -272,7 +298,7 @@ export default function ProductDetailPage() {
         </section>
       )}
 
-      {/* AI Recommendations — Alternatives */}
+      
       {alternatives.length > 0 && (
         <section className="rec-section">
           <h2 className="rec-heading">🔄 Alternative Products <span className="ai-tag">AI Powered</span></h2>
@@ -283,7 +309,7 @@ export default function ProductDetailPage() {
         </section>
       )}
 
-      {/* Reviews */}
+      
       <section className="reviews-section">
         <h2>Reviews & Ratings</h2>
 

@@ -10,7 +10,7 @@ router.put('/', authenticate, validateUpdateProfile, validate, profileController
 router.post('/change-password/request', authenticate, profileController.requestChangePassword);
 router.post('/change-password/confirm', authenticate, validatePasswordChangeConfirm, validate, profileController.confirmChangePassword);
 
-// Delivery address routes
+
 router.get('/address', authenticate, profileController.getDeliveryAddress);
 router.put('/address', authenticate, profileController.saveDeliveryAddress);
 

@@ -6,7 +6,7 @@ import Spinner from '../components/common/Spinner';
 import Pagination from '../components/common/Pagination';
 import '../styles/pages/orders.css';
 
-// Group orders by orderGroupId; ungrouped orders stay individual
+
 function groupOrders(orders) {
   const groups = [];
   const groupMap = new Map();
@@ -21,7 +21,7 @@ function groupOrders(orders) {
         groupMap.get(o.orderGroupId).orders.push(o);
       }
     } else {
-      // Single item order
+      
       groups.push({ groupId: null, orders: [o], createdAt: o.createdAt });
     }
   }
@@ -68,10 +68,10 @@ export default function OrdersPage() {
         });
       }
 
-      // Clean the URL without reloading the page
+      
       window.history.replaceState({}, document.title, window.location.pathname);
 
-      // Auto dismiss after 5 seconds
+      
       setTimeout(() => setPaymentPopup(null), 5000);
     }
 
@@ -126,7 +126,7 @@ export default function OrdersPage() {
               const firstOrder = group.orders[0];
 
               if (!isGrouped) {
-                // Single order — same as before
+                
                 const o = firstOrder;
                 return (
                   <Link to={`/orders/${o.id}`} className="order-card" key={o.id}>
@@ -149,7 +149,7 @@ export default function OrdersPage() {
                 );
               }
 
-              // Grouped order — show as a single card with multiple items
+              
               return (
                 <div className="order-group-card" key={group.groupId}>
                   <div className="order-group-header">

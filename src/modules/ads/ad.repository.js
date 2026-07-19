@@ -81,13 +81,11 @@ const softDelete = async (id) => {
   return ad.update({ status: 'deleted' });
 };
 
-// Admin: find all ads regardless of status with pagination
 const findAllAdmin = async (filters = {}, { limit, offset } = {}) => {
   const where = {};
   const include = [{ model: User, as: 'seller', attributes: ['id', 'fullName'] }];
 
   if (filters.search) {
-    // Search by title OR seller name using subQuery: false approach
     where[Op.or] = [
       { title: { [Op.iLike]: `%${filters.search}%` } },
       { '$seller.fullName$': { [Op.iLike]: `%${filters.search}%` } },

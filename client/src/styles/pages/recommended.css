@@ -1,15 +1,13 @@
-/* ══════════════════════════════════════════════════════════
-   Recommended for You — Horizontal Carousel
-   ══════════════════════════════════════════════════════════ */
 
-/* ── Section Wrapper ─────────────────────────────────── */
+
+
 .rec-section {
   max-width: 1200px;
   margin: 0 auto;
   padding: 3rem 2rem 2rem;
 }
 
-/* ── Header ──────────────────────────────────────────── */
+
 .rec-header {
   margin-bottom: 1.8rem;
 }
@@ -40,15 +38,15 @@
 .rec-subtitle {
   color: var(--text-muted);
   font-size: 0.9rem;
-  margin-left: calc(36px + 0.6rem); /* align with title text */
+  margin-left: calc(36px + 0.6rem); 
 }
 
-/* ── Carousel Wrapper ────────────────────────────────── */
+
 .rec-carousel-wrapper {
   position: relative;
 }
 
-/* ── Scroll Track ────────────────────────────────────── */
+
 .rec-scroll {
   display: flex;
   gap: 1.25rem;
@@ -56,13 +54,13 @@
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   padding: 0.5rem 0.25rem 1.5rem;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none; 
 }
 .rec-scroll::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none; 
 }
 
-/* ── Arrow Buttons ───────────────────────────────────── */
+
 .rec-arrow {
   position: absolute;
   top: 50%;
@@ -102,7 +100,7 @@
   right: -12px;
 }
 
-/* ── Product Card ────────────────────────────────────── */
+
 .rec-card {
   flex: 0 0 240px;
   scroll-snap-align: start;
@@ -122,7 +120,7 @@
   border-color: var(--accent-amber);
 }
 
-/* Card Image */
+
 .rec-card-img {
   position: relative;
   height: 180px;
@@ -154,7 +152,7 @@
   border: 1px solid rgba(0, 229, 255, 0.25);
 }
 
-/* Card Body */
+
 .rec-card-body {
   padding: 1rem 1.1rem 1.1rem;
   display: flex;
@@ -201,7 +199,7 @@
   font-size: 0.7rem;
 }
 
-/* ── Loading Skeletons ───────────────────────────────── */
+
 .rec-loading {
   display: flex;
   gap: 1.25rem;
@@ -243,7 +241,7 @@
   100% { background-position: -100% 0; }
 }
 
-/* ── Responsive ──────────────────────────────────────── */
+
 @media (max-width: 768px) {
   .rec-section {
     padding: 2rem 1rem 1.5rem;
@@ -268,6 +266,6 @@
     height: 150px;
   }
   .rec-arrow {
-    display: none; /* touch scroll on mobile */
+    display: none; 
   }
 }

@@ -1,4 +1,3 @@
-const path = require('path');
 const transporter = require('../config/email');
 
 const sendEmail = async (to, subject, html) => {

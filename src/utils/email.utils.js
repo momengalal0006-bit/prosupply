@@ -1,13 +1,5 @@
 const transporter = require('../config/email');
 
-/**
- * Send a branded password-reset email containing a 6-digit OTP.
- *
- * @param {string} to        - Recipient email address.
- * @param {string} fullName  - Recipient's full name (used in greeting).
- * @param {string} otp       - The plain-text 6-digit OTP to display.
- * @returns {Promise<void>}
- */
 const sendPasswordResetEmail = async (to, fullName, otp) => {
   const html = `
 <!DOCTYPE html>
@@ -24,7 +16,6 @@ const sendPasswordResetEmail = async (to, fullName, otp) => {
         <table role="presentation" width="520" cellpadding="0" cellspacing="0"
           style="background-color:#151E32;border:1px solid #2A3B5C;border-radius:12px;overflow:hidden;">
 
-          <!-- Header -->
           <tr>
             <td style="padding:32px 40px 16px 40px;text-align:center;">
               <h1 style="margin:0;font-size:28px;color:#00E5FF;font-weight:700;">
@@ -33,7 +24,6 @@ const sendPasswordResetEmail = async (to, fullName, otp) => {
             </td>
           </tr>
 
-          <!-- Body -->
           <tr>
             <td style="padding:8px 40px 24px 40px;color:#CBD5E1;font-size:15px;line-height:1.7;">
               <p style="margin:0 0 16px;">Hi <strong style="color:#FFFFFF;">${fullName}</strong>,</p>
@@ -42,7 +32,6 @@ const sendPasswordResetEmail = async (to, fullName, otp) => {
                 Use the code below to complete the process:
               </p>
 
-              <!-- OTP Block -->
               <div style="text-align:center;margin:0 0 24px;">
                 <div style="display:inline-block;background-color:#0B1121;border:2px solid #00E5FF;border-radius:10px;padding:18px 36px;">
                   <span style="font-size:2.5rem;font-weight:700;letter-spacing:0.3em;color:#00E5FF;font-family:'Courier New',monospace;">
@@ -62,7 +51,6 @@ const sendPasswordResetEmail = async (to, fullName, otp) => {
             </td>
           </tr>
 
-          <!-- Footer -->
           <tr>
             <td style="padding:20px 40px;border-top:1px solid #2A3B5C;text-align:center;">
               <p style="margin:0;font-size:12px;color:#475569;">

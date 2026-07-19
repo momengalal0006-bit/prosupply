@@ -35,7 +35,6 @@ const refreshTokenCtrl = async (req, res, next) => {
     }
     const decoded = verifyRefreshToken(token);
     const { accessToken } = await authService.refreshAccessToken(decoded.id, token);
-    // Set only the new access token cookie
     const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('accessToken', accessToken, {
       httpOnly: true, secure: isProduction, sameSite: 'strict',

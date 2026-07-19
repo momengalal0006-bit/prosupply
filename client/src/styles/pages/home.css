@@ -1,6 +1,4 @@
-/* ══════════════════════════════════════════════════════════
-   HomePage Styles
-   ══════════════════════════════════════════════════════════ */
+
 .home-hero {
   background: linear-gradient(135deg, var(--navy-dark) 0%, #0d1a2d 50%, #0b1428 100%);
   padding: 4rem 2rem 3rem;
@@ -46,7 +44,7 @@
   margin-bottom: 2rem;
 }
 
-/* Category Cards */
+
 .categories-section {
   max-width: 1200px;
   margin: -3rem auto 0;
@@ -113,7 +111,7 @@
   font-size: 0.9rem;
 }
 
-/* Seller CTA Banner */
+
 .seller-cta-section {
   background: var(--navy-dark);
   padding: 4rem 2rem;
@@ -151,7 +149,7 @@
   box-shadow: 0 10px 30px rgba(0,229,255,0.3);
 }
 
-/* About Section */
+
 .about-section {
   max-width: 1000px;
   margin: 0 auto;

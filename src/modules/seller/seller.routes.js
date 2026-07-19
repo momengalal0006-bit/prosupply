@@ -7,7 +7,7 @@ const { validate } = require('../../middleware/validate.middleware');
 const { validateApply } = require('./seller.validation');
 const { uploadDocuments } = require('../../config/multer');
 
-// Register notifications routes BEFORE parameterized routes
+
 router.get('/notifications', authenticate, isSeller, sellerController.notifications);
 router.put('/notifications/read-all', authenticate, isSeller, sellerController.markAllRead);
 router.delete('/notifications/clear', authenticate, isSeller, sellerController.clearAllNotifications);

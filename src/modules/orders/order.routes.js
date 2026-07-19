@@ -6,14 +6,12 @@ const { isSeller } = require('../../middleware/isSeller.middleware');
 const { validate } = require('../../middleware/validate.middleware');
 const { validateCheckout } = require('./order.validation');
 
-// Buyer routes
 router.post('/checkout', authenticate, validateCheckout, validate, orderController.checkout);
 router.post('/checkout-cart', authenticate, orderController.checkoutCart);
 router.get('/history', authenticate, orderController.getHistory);
 router.delete('/history/clear', authenticate, orderController.clearHistory);
 router.get('/:id', authenticate, orderController.getById);
 
-// Seller routes (mounted under /api/seller as well)
 router.get('/sales', authenticate, isSeller, orderController.getSales);
 router.put('/:id/status', authenticate, isSeller, orderController.updateStatus);
 

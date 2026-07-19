@@ -1,7 +1,7 @@
 const multer = require('multer');
 const path = require('path');
 
-const maxSize = parseInt(process.env.MAX_FILE_SIZE, 10) || 5242880; // 5 MB
+const maxSize = parseInt(process.env.MAX_FILE_SIZE, 10) || 5242880;
 
 const imageFilter = (req, file, cb) => {
   const allowed = /jpeg|jpg|png/;

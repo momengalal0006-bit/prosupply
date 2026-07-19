@@ -109,7 +109,7 @@ export default function ProfilePage() {
         </aside>
 
         <section className="profile-content cyan-frame">
-          {/* Personal Info */}
+          
           {activeTab === 'personal-info' && (
             <div className="content-section active">
               <div className="content-header"><h2>Personal Information</h2>
@@ -127,7 +127,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Delivery Address */}
+          
           {activeTab === 'delivery-address' && (
             <div className="content-section active">
               <div className="content-header"><h2>Delivery Address</h2>
@@ -150,7 +150,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Company Details */}
+          
           {activeTab === 'company-details' && profile?.role !== 'admin' && (
             <div className="content-section active">
               <div className="content-header"><h2>Company Details</h2>
@@ -165,7 +165,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Security */}
+          
           {activeTab === 'security-pass' && (
             <div className="content-section active">
               <div className="content-header"><h2>Security & Password</h2></div>

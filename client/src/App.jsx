@@ -12,6 +12,7 @@ import OrderDetailPage from './pages/OrderDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import SellerApplyPage from './pages/SellerApplyPage';
 import SellerDashboardPage from './pages/SellerDashboardPage';
+import SellerProfilePage from './pages/SellerProfilePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -23,6 +24,7 @@ import {
   AdminCommissionsPage,
 } from './pages/AdminPages';
 import AdminRoute from './components/auth/AdminRoute';
+import UserRoute from './components/auth/UserRoute';
 import { useAuth } from './hooks/useAuth';
 import { Link } from 'react-router-dom';
 
@@ -46,11 +48,11 @@ export default function App() {
       <AuthProvider>
         <ToastProvider>
           <Routes>
-            {/* Auth pages — NO Navbar / Footer */}
+            
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
-            {/* Marketplace pages with shared Navbar + Footer */}
+            
             <Route element={<MarketplaceLayout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/spare-parts" element={<CategoryPage category="Spare Parts" key="spare-parts" />} />
@@ -64,16 +66,17 @@ export default function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/seller/apply" element={<SellerApplyPage />} />
               <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
+              <Route path="/seller/:sellerId" element={<UserRoute><SellerProfilePage /></UserRoute>} />
             </Route>
 
-            {/* Admin pages */}
+            
             <Route path="/admin" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
             <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
             <Route path="/admin/ads" element={<AdminRoute><AdminAdsPage /></AdminRoute>} />
             <Route path="/admin/applications" element={<AdminRoute><AdminApplicationsPage /></AdminRoute>} />
             <Route path="/admin/commissions" element={<AdminRoute><AdminCommissionsPage /></AdminRoute>} />
 
-            {/* Catch-all fallback */}
+            
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </ToastProvider>

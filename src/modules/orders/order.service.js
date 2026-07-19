@@ -15,29 +15,24 @@ const processSuccessfulPayment = async (orderGroupId) => {
   try {
     const orders = await Order.findAll({ where: { orderGroupId, paymentStatus: 'pending' }, transaction: t });
     
-    // If no pending orders found, either already processed or doesn't exist.
     if (!orders || orders.length === 0) {
       await t.rollback();
       return;
     }
 
-    // Mark as paid
     await Order.update({ paymentStatus: 'paid' }, { where: { orderGroupId }, transaction: t });
 
-    // Process earnings for Sellers and Admin
     for (const order of orders) {
       const commission = parseFloat(order.commissionAmount || 0);
       const total = parseFloat(order.totalPrice);
       const sellerEarning = total - commission;
 
-      // Update Seller
       await User.increment({
         totalEarnings: sellerEarning,
         pendingBalance: sellerEarning,
         totalOrders: 1
       }, { where: { id: order.sellerId }, transaction: t });
 
-      // Update Admin (assuming first user with role 'admin')
       const admin = await User.findOne({ where: { role: 'admin' }, transaction: t });
       if (admin) {
         await admin.increment({
@@ -50,7 +45,6 @@ const processSuccessfulPayment = async (orderGroupId) => {
 
     await t.commit();
 
-    // Send Emails (Non-blocking)
     const sellerIds = [...new Set(orders.map(o => o.sellerId))];
     for (const sid of sellerIds) {
       const seller = await User.findByPk(sid);
@@ -72,7 +66,6 @@ const processSuccessfulPayment = async (orderGroupId) => {
 };
 
 const checkout = async ({ adId, quantity, paymentMethod }, buyerId) => {
-  // Early stock check
   const adCheck = await Ad.findByPk(adId);
   if (!adCheck || adCheck.status === 'deleted') {
     const err = new Error('Ad not found.');
@@ -92,7 +85,6 @@ const checkout = async ({ adId, quantity, paymentMethod }, buyerId) => {
     throw err;
   }
 
-  // Delivery address check
   const { User } = require('../../models/index');
   const buyer = await User.findByPk(buyerId);
   if (!buyer || !buyer.deliveryStreet || !buyer.deliveryCity || !buyer.deliveryBuilding || !buyer.deliveryArea || !buyer.deliveryDistrict) {
@@ -110,18 +102,17 @@ const checkout = async ({ adId, quantity, paymentMethod }, buyerId) => {
     notes: buyer.deliveryNotes,
   });
 
-  const totalPrice = parseFloat(ad.price) * quantity;
+  const totalPrice = parseFloat(adCheck.price) * quantity;
   const orderGroupId = `GRP-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const delivery = JSON.parse(deliverySnapshot);
 
-  // Create Paymob Payment Key (Classic API) before transaction to prevent locking
   const paymentKey = await paymobService.createPaymentKey({
     amount: Math.round(totalPrice * 100),
     currency: 'EGP',
     items: [{
-      name: ad.title,
-      amount: Math.round(parseFloat(ad.price) * 100),
-      description: ad.title,
+      name: adCheck.title,
+      amount: Math.round(parseFloat(adCheck.price) * 100),
+      description: adCheck.title,
       quantity,
     }],
     billingData: {
@@ -138,7 +129,6 @@ const checkout = async ({ adId, quantity, paymentMethod }, buyerId) => {
 
   const t = await sequelize.transaction();
   try {
-    // Re-check with lock
     const lockedAd = await Ad.findByPk(adId, { lock: t.LOCK.UPDATE, transaction: t });
     if (!lockedAd || lockedAd.status === 'deleted') {
       throw Object.assign(new Error('Ad not found.'), { statusCode: 404 });
@@ -147,17 +137,14 @@ const checkout = async ({ adId, quantity, paymentMethod }, buyerId) => {
       throw Object.assign(new Error('Insufficient stock.'), { statusCode: 400, code: 'INSUFFICIENT_STOCK' });
     }
 
-    // Calculate commission
     const { commission, rateLabel } = calculateCommission(totalPrice);
 
-    // Update ad quantity
     const newQty = lockedAd.quantity - quantity;
     await lockedAd.update({
       quantity: newQty,
       status: newQty === 0 ? 'deleted' : 'active',
     }, { transaction: t });
 
-    // Create order
     const order = await orderRepo.create({
       buyerId,
       adId: lockedAd.id,
@@ -175,7 +162,6 @@ const checkout = async ({ adId, quantity, paymentMethod }, buyerId) => {
       orderGroupId,
     }, t);
 
-    // Create notification for seller
     await Notification.create({
       userId: lockedAd.sellerId,
       type: 'new_order',
@@ -202,7 +188,6 @@ const checkoutCart = async (buyerId) => {
     throw err;
   }
 
-  // Delivery address check
   const { User } = require('../../models/index');
   const buyer = await User.findByPk(buyerId);
   if (!buyer || !buyer.deliveryStreet || !buyer.deliveryCity || !buyer.deliveryBuilding || !buyer.deliveryArea || !buyer.deliveryDistrict) {
@@ -220,7 +205,6 @@ const checkoutCart = async (buyerId) => {
     notes: buyer.deliveryNotes,
   });
 
-  // Early stock check
   for (const item of cartItems) {
     if (!item.Ad || item.Ad.status === 'deleted') {
       const err = new Error(`Ad "${item.Ad?.title || item.adId}" is no longer available.`);
@@ -241,16 +225,13 @@ const checkoutCart = async (buyerId) => {
     }
   }
 
-  // Calculate total
   let combinedTotal = 0;
   cartItems.forEach(item => {
     combinedTotal += parseFloat(item.Ad.price) * item.quantity;
   });
 
-  // Generate a group ID so all items from this checkout are linked
   const orderGroupId = `GRP-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-  // Create Paymob Payment Key (Classic API) before transaction to prevent locking
   const delivery = JSON.parse(deliverySnapshot);
   const paymentKey = await paymobService.createPaymentKey({
     amount: Math.round(combinedTotal * 100),
@@ -275,7 +256,6 @@ const checkoutCart = async (buyerId) => {
 
   const t = await sequelize.transaction();
   try {
-    // Lock all ads
     for (const item of cartItems) {
       const ad = await Ad.findByPk(item.adId, { lock: t.LOCK.UPDATE, transaction: t });
       if (!ad || ad.status === 'deleted') {
@@ -327,7 +307,6 @@ const checkoutCart = async (buyerId) => {
       }, { transaction: t });
     }
 
-    // Clear cart
     await CartItem.destroy({ where: { userId: buyerId }, transaction: t });
 
     await t.commit();
@@ -384,7 +363,6 @@ const updateOrderStatus = async (orderId, newStatus, sellerId) => {
   }
   const updated = await orderRepo.updateStatus(orderId, { orderStatus: newStatus });
 
-  // Recalculate trust score when order is delivered
   if (newStatus === 'delivered') {
     try {
       const { updateSellerTrustScore } = require('../../utils/trustScore');

@@ -9,7 +9,6 @@ import '../styles/pages/admin.css';
 
 function AdminSidebar() {
   const loc = useLocation();
-  const { logout } = useAuth();
   const navItems = [
     { to: '/admin', label: '📊 Dashboard' },
     { to: '/admin/users', label: '👥 Users' },
@@ -19,26 +18,80 @@ function AdminSidebar() {
   ];
   return (
     <aside className="admin-sidebar">
-      <Link to="/admin" className="admin-logo-link"><img src="/images/logo.png" alt="ProSupply" className="admin-logo-img" /></Link><p>Admin Panel</p>
-      <nav className="admin-nav">{navItems.map((n) => <Link key={n.to} to={n.to} className={loc.pathname === n.to ? 'active' : ''}>{n.label}</Link>)}</nav>
+      <Link to="/admin" className="admin-logo-link">
+        <img src="/images/logo.png" alt="ProSupply" className="admin-logo-img" />
+      </Link>
+      <p>Admin Panel</p>
+      <div className="admin-sidebar-header">
+        <h3>Panel Navigation</h3>
+      </div>
+      <nav className="admin-nav">
+        {navItems.map((n) => (
+          <Link
+            key={n.to}
+            to={n.to}
+            className={`admin-sidebar-item${loc.pathname === n.to ? ' active' : ''}`}
+          >
+            {n.label}
+          </Link>
+        ))}
+      </nav>
     </aside>
   );
 }
 
-function AdminShell({ title, children }) {
+function AdminHeader() {
+  const { user } = useAuth();
   const { logout } = useAuth();
+  const initials = user?.fullName
+    ? user.fullName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+    : 'AD';
+
   return (
-    <div className="admin-layout">
-      <AdminSidebar />
-      <main className="admin-main">
-        <div className="admin-topbar"><h1>{title}</h1><button className="admin-logout" onClick={async () => { await logout(); window.location.href = '/login'; }}>Logout</button></div>
-        {children}
-      </main>
+    <div className="admin-header">
+      <div className="admin-header-inner">
+        <div className="admin-avatar">{initials}</div>
+        <div className="admin-header-info">
+          <h1 className="admin-header-name">{user?.fullName || 'Administrator'}</h1>
+          <div className="admin-header-meta">
+            <span className="admin-role-badge">🛡️ Platform Administrator</span>
+            <span className="admin-header-email">✉️ {user?.email}</span>
+          </div>
+        </div>
+        <div className="admin-header-actions">
+          <button
+            className="admin-logout-btn"
+            onClick={async () => {
+              await logout();
+              window.location.href = '/login';
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
 
-/* ── Dashboard ── */
+function AdminShell({ title, children }) {
+  return (
+    <div className="admin-layout-wrapper">
+      <AdminHeader />
+      <div className="admin-body">
+        <div className="admin-dashboard-layout">
+          <AdminSidebar />
+          <main className="admin-content-main">
+            <h1 className="admin-section-heading">{title}</h1>
+            {children}
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 export function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
@@ -74,7 +127,7 @@ export function AdminDashboardPage() {
 
   function trustBadge(score) {
     const s = parseFloat(score);
-    if (isNaN(s)) return <span className="badge" style={{background:'rgba(255,255,255,0.1)',color:'#94A3B8'}}>—</span>;
+    if (isNaN(s)) return <span className="badge badge-empty">—</span>;
     let cls = 'badge-approved', label = s;
     if (s < 40) cls = 'badge-banned';
     else if (s < 60) cls = 'badge-pending_review';
@@ -83,45 +136,124 @@ export function AdminDashboardPage() {
 
   return (
     <AdminShell title="Admin Dashboard">
-      {stats && <div className="admin-stats">
-        <div className="admin-stat"><span className="val">{stats.totalUsers}</span><span className="lbl">Total Users</span></div>
-        <div className="admin-stat"><span className="val">{stats.pendingApplications}</span><span className="lbl">Pending Applications</span></div>
-        <div className="admin-stat"><span className="val">{stats.activeAds}</span><span className="lbl">Active Ads</span></div>
-        <div className="admin-stat"><span className="val">{stats.totalOrders}</span><span className="lbl">Total Orders Processed</span></div>
-        <div className="admin-stat"><span className="val" style={{color:'#4ade80'}}>EGP {parseFloat(stats.totalCommissions).toLocaleString('en-US',{minimumFractionDigits:2})}</span><span className="lbl">Total Commission Earned</span></div>
-      </div>}
+      {stats && (
+        <div className="admin-stats">
+          <div className="admin-stat">
+            <span className="val">{stats.totalUsers}</span>
+            <span className="lbl">Total Users</span>
+          </div>
+          <div className="admin-stat">
+            <span className="val">{stats.pendingApplications}</span>
+            <span className="lbl">Pending Applications</span>
+          </div>
+          <div className="admin-stat">
+            <span className="val">{stats.activeAds}</span>
+            <span className="lbl">Active Ads</span>
+          </div>
+          <div className="admin-stat">
+            <span className="val">{stats.totalOrders}</span>
+            <span className="lbl">Total Orders Processed</span>
+          </div>
+          <div className="admin-stat revenue-card">
+            <span className="val">
+              EGP {parseFloat(stats.totalCommissions).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            </span>
+            <span className="lbl">Total Commission Earned</span>
+          </div>
+        </div>
+      )}
 
-      {/* Flagged Sellers — Fraud Detection */}
-      <div className="admin-card" style={{marginBottom:'1.5rem'}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}}>
-          <h2 style={{margin:0}}>🛡️ Flagged Sellers — Fraud Detection <span style={{background:'linear-gradient(135deg,#818cf8,#c084fc)',color:'white',fontSize:'0.6rem',fontWeight:700,padding:'2px 8px',borderRadius:20,marginLeft:8,textTransform:'uppercase',letterSpacing:'0.5px'}}>AI Powered</span></h2>
-          <button className="action-btn btn-approve" onClick={recalcTrust} disabled={recalculating} style={{padding:'0.5rem 1rem'}}>
+      
+      <div className="admin-card">
+        <div className="admin-card-header">
+          <h2>
+            🛡️ Flagged Sellers — Fraud Detection{' '}
+            <span className="ai-badge">AI Powered</span>
+          </h2>
+          <button
+            className="admin-primary-btn"
+            onClick={recalcTrust}
+            disabled={recalculating}
+          >
             {recalculating ? 'Recalculating...' : '🔄 Recalculate Scores'}
           </button>
         </div>
-        {flagged.length === 0 ? <p style={{color:'rgba(255,255,255,.5)'}}>No flagged sellers. All sellers have good trust scores.</p> :
-        <table className="admin-table"><thead><tr><th>Seller</th><th>Email</th><th>Trust Score</th><th>Flags</th></tr></thead>
-          <tbody>{flagged.map((f) => <tr key={f.id}>
-            <td>{f.fullName}</td>
-            <td>{f.email}</td>
-            <td>{trustBadge(f.trustAnalysis?.score)}</td>
-            <td>{f.trustAnalysis?.flags?.length > 0 ?
-              <ul style={{margin:0,padding:0,listStyle:'none'}}>
-                {f.trustAnalysis.flags.map((fl,i) => <li key={i} style={{fontSize:'0.78rem',color:'#f87171',marginBottom:2}}>⚠️ {fl}</li>)}
-              </ul> : <span style={{color:'rgba(255,255,255,.4)'}}>None</span>}
-            </td>
-          </tr>)}</tbody></table>}
+        {flagged.length === 0 ? (
+          <p className="admin-empty-text">No flagged sellers. All sellers have good trust scores.</p>
+        ) : (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Seller</th>
+                  <th>Email</th>
+                  <th>Trust Score</th>
+                  <th>Flags</th>
+                </tr>
+              </thead>
+              <tbody>
+                {flagged.map((f) => (
+                  <tr key={f.id}>
+                    <td>{f.fullName}</td>
+                    <td>{f.email}</td>
+                    <td>{trustBadge(f.trustAnalysis?.score)}</td>
+                    <td>
+                      {f.trustAnalysis?.flags?.length > 0 ? (
+                        <ul className="flag-list">
+                          {f.trustAnalysis.flags.map((fl, i) => (
+                            <li key={i} className="flag-item">
+                              ⚠️ {fl}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <span className="badge badge-empty">None</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      <div className="admin-card"><h2>Recent Users</h2>
-        {users.length > 0 ? <table className="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Seller Status</th><th>Trust</th></tr></thead>
-          <tbody>{users.map((u) => <tr key={u.id}><td>{u.fullName}</td><td>{u.email}</td><td><span className={`badge badge-${u.sellerStatus}`}>{u.sellerStatus}</span></td><td>{u.sellerStatus === 'approved' ? trustBadge(u.trustScore) : '—'}</td></tr>)}</tbody></table> : <p style={{color:'rgba(255,255,255,.6)'}}>No users.</p>}
+      <div className="admin-card">
+        <h2>Recent Users</h2>
+        {users.length > 0 ? (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Seller Status</th>
+                  <th>Trust</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u.id}>
+                    <td>{u.fullName}</td>
+                    <td>{u.email}</td>
+                    <td>
+                      <span className={`badge badge-${u.sellerStatus}`}>{u.sellerStatus}</span>
+                    </td>
+                    <td>{u.sellerStatus === 'approved' ? trustBadge(u.trustScore) : '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="admin-empty-text">No users.</p>
+        )}
       </div>
     </AdminShell>
   );
 }
 
-/* ── Users ── */
+
 export function AdminUsersPage() {
   const showToast = useToast();
   const [users, setUsers] = useState([]);
@@ -147,25 +279,99 @@ export function AdminUsersPage() {
 
   return (
     <AdminShell title="User Management">
-      <input className="search-bar" placeholder="Search by name or email..." value={search} onChange={(e) => onSearch(e.target.value)} />
-      <table className="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Seller Status</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
-        <tbody>{users.map((u) => {
-          const role = u.role === 'admin' ? 'admin' : u.sellerStatus === 'approved' ? 'seller' : u.role;
-          return <tr key={u.id}><td>{u.fullName}</td><td>{u.email}</td><td><span className={`badge badge-${role}`}>{role}</span></td>
-            <td><span className={`badge badge-${u.sellerStatus}`}>{u.sellerStatus}</span></td>
-            <td>{u.isBanned ? <span className="badge badge-banned">Banned</span> : <span className="badge badge-approved">Active</span>}</td>
-            <td>{new Date(u.createdAt).toLocaleDateString()}</td>
-            <td>{u.isBanned ? <button className="action-btn btn-unban" onClick={() => unbanUser(u.id)}>Unban</button> : <button className="action-btn btn-ban" onClick={() => banUser(u.id)}>Ban</button>}
-              {u.role !== 'admin' && <button className="action-btn btn-delete" onClick={() => setConfirmModal(u)}>Delete</button>}</td></tr>;
-        })}</tbody></table>
+      <input
+        className="search-bar"
+        placeholder="Search by name or email..."
+        value={search}
+        onChange={(e) => onSearch(e.target.value)}
+      />
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Seller Status</th>
+              <th>Status</th>
+              <th>Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((u) => {
+              const role = u.role === 'admin' ? 'admin' : u.sellerStatus === 'approved' ? 'seller' : u.role;
+              return (
+                <tr key={u.id}>
+                  <td>{u.fullName}</td>
+                  <td>{u.email}</td>
+                  <td>
+                    <span className={`badge badge-${role}`}>{role}</span>
+                  </td>
+                  <td>
+                    <span className={`badge badge-${u.sellerStatus}`}>{u.sellerStatus}</span>
+                  </td>
+                  <td>
+                    {u.isBanned ? (
+                      <span className="badge badge-banned">Banned</span>
+                    ) : (
+                      <span className="badge badge-approved">Active</span>
+                    )}
+                  </td>
+                  <td>{new Date(u.createdAt).toLocaleDateString()}</td>
+                  <td>
+                    {u.isBanned ? (
+                      <button className="action-btn btn-unban" onClick={() => unbanUser(u.id)}>
+                        Unban
+                      </button>
+                    ) : (
+                      <button className="action-btn btn-ban" onClick={() => banUser(u.id)}>
+                        Ban
+                      </button>
+                    )}
+                    {u.role !== 'admin' && (
+                      <button className="action-btn btn-delete" onClick={() => setConfirmModal(u)}>
+                        Delete
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
       <Pagination page={page} totalPages={totalPages} onPageChange={(p) => load(p, search)} />
-      {confirmModal && <div className="confirm-overlay active"><div className="confirm-card cyan-frame"><h3>Delete User</h3><p>Delete "{confirmModal.fullName}"?</p>
-        <div className="confirm-actions"><button className="confirm-yes" onClick={() => deleteUser(confirmModal.id)}>Yes</button><button className="confirm-no" onClick={() => setConfirmModal(null)}>Cancel</button></div></div></div>}
+      
+      {confirmModal && (
+        <div className="modal-overlay active">
+          <div className="modal-card confirm-modal-card">
+            <h3 className="confirm-modal-title">Delete User</h3>
+            <p className="confirm-modal-message">
+              Are you sure you want to delete user "{confirmModal.fullName}"? This action cannot be undone.
+            </p>
+            <div className="confirm-modal-actions">
+              <button
+                className="confirm-modal-btn btn-delete"
+                onClick={() => deleteUser(confirmModal.id)}
+              >
+                Yes, Delete
+              </button>
+              <button
+                className="btn-cancel-modal confirm-modal-btn"
+                onClick={() => setConfirmModal(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminShell>
   );
 }
 
-/* ── Ads ── */
+
 export function AdminAdsPage() {
   const showToast = useToast();
   const [ads, setAds] = useState([]);
@@ -191,17 +397,62 @@ export function AdminAdsPage() {
 
   return (
     <AdminShell title="Ads Management">
-      <input className="search-bar" placeholder="Search ads..." value={search} onChange={(e) => onSearch(e.target.value)} />
-      <table className="admin-table"><thead><tr><th>Title</th><th>Seller</th><th>Price</th><th>Status</th><th>Origin</th><th>Date</th><th>Action</th></tr></thead>
-        <tbody>{ads.map((a) => <tr key={a.id}><td><button type="button" onClick={() => window.open(`/product/${a.id}`, '_blank', 'noopener,noreferrer')} style={{background:'none',border:'none',padding:0,color:'#60a5fa',cursor:'pointer',textAlign:'left'}}>{a.title}</button></td><td>{a.seller?.fullName||'N/A'}</td><td>EGP {parseFloat(a.price).toFixed(2)}</td>
-          <td><span className={`badge badge-${a.status}`}>{a.status}</span></td><td>{a.countryOfOrigin||'—'}</td><td>{new Date(a.createdAt).toLocaleDateString()}</td>
-          <td>{a.status==='active' && <button className="action-btn btn-delete" onClick={() => deleteAd(a.id)}>Delete</button>}</td></tr>)}</tbody></table>
+      <input
+        className="search-bar"
+        placeholder="Search ads..."
+        value={search}
+        onChange={(e) => onSearch(e.target.value)}
+      />
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Seller</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Origin</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ads.map((a) => (
+              <tr key={a.id}>
+                <td>
+                  <button
+                    type="button"
+                    onClick={() => window.open(`/product/${a.id}`, '_blank', 'noopener,noreferrer')}
+                    className="admin-table-link-btn"
+                  >
+                    {a.title}
+                  </button>
+                </td>
+                <td>{a.seller?.fullName || 'N/A'}</td>
+                <td>EGP {parseFloat(a.price).toFixed(2)}</td>
+                <td>
+                  <span className={`badge badge-${a.status}`}>{a.status}</span>
+                </td>
+                <td>{a.countryOfOrigin || '—'}</td>
+                <td>{new Date(a.createdAt).toLocaleDateString()}</td>
+                <td>
+                  {a.status === 'active' && (
+                    <button className="action-btn btn-delete" onClick={() => deleteAd(a.id)}>
+                      Delete
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <Pagination page={page} totalPages={totalPages} onPageChange={(p) => load(p, search)} />
     </AdminShell>
   );
 }
 
-/* ── Applications ── */
+
 export function AdminApplicationsPage() {
   const showToast = useToast();
   const [apps, setApps] = useState([]);
@@ -220,22 +471,85 @@ export function AdminApplicationsPage() {
   return (
     <AdminShell title="Seller Applications">
       <div className="filter-tabs">
-        {[{v:'',l:'All'},{v:'pending_review',l:'Pending'},{v:'approved',l:'Approved'},{v:'rejected',l:'Rejected'}].map((f) =>
-          <button key={f.v} className={`filter-tab${statusFilter===f.v?' active':''}`} onClick={() => { setStatusFilter(f.v); load(f.v); }}>{f.l}</button>
-        )}
+        {[
+          { v: '', l: 'All' },
+          { v: 'pending_review', l: 'Pending' },
+          { v: 'approved', l: 'Approved' },
+          { v: 'rejected', l: 'Rejected' },
+        ].map((f) => (
+          <button
+            key={f.v}
+            className={`filter-tab${statusFilter === f.v ? ' active' : ''}`}
+            onClick={() => {
+              setStatusFilter(f.v);
+              load(f.v);
+            }}
+          >
+            {f.l}
+          </button>
+        ))}
       </div>
-      {apps.length === 0 ? <p style={{color:'rgba(255,255,255,0.5)',padding:'2rem'}}>No applications.</p> :
-      <table className="admin-table"><thead><tr><th>Applicant</th><th>Email</th><th>Business</th><th>Documents</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody>{apps.map((a) => <tr key={a.id}><td>{a.User?.fullName||'N/A'}</td><td>{a.User?.email||'N/A'}</td><td>{a.businessName}</td>
-          <td>{Array.isArray(a.documents) && a.documents.length > 0 ? a.documents.map((d,i) => <a key={i} href={normalizeDocUrl(d)} target="_blank" rel="noopener noreferrer">Doc {i+1}<br/></a>) : <span style={{opacity:.65}}>No docs</span>}</td>
-          <td>{new Date(a.submittedAt||a.createdAt).toLocaleDateString()}</td>
-          <td><span className={`badge badge-${a.status}`}>{a.status.replace('_',' ')}</span></td>
-          <td>{a.status==='pending_review' && <><button className="action-btn btn-approve" onClick={() => approve(a.id)}>Approve</button><button className="action-btn btn-reject" onClick={() => reject(a.id)}>Reject</button></>}</td></tr>)}</tbody></table>}
+      {apps.length === 0 ? (
+        <p className="admin-empty-text">No applications.</p>
+      ) : (
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Applicant</th>
+                <th>Email</th>
+                <th>Business</th>
+                <th>Documents</th>
+                <th>Submitted</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {apps.map((a) => (
+                <tr key={a.id}>
+                  <td>{a.User?.fullName || 'N/A'}</td>
+                  <td>{a.User?.email || 'N/A'}</td>
+                  <td>{a.businessName}</td>
+                  <td>
+                    {Array.isArray(a.documents) && a.documents.length > 0 ? (
+                      a.documents.map((d, i) => (
+                        <a key={i} href={normalizeDocUrl(d)} target="_blank" rel="noopener noreferrer">
+                          Doc {i + 1}
+                          <br />
+                        </a>
+                      ))
+                    ) : (
+                      <span className="badge badge-empty">No docs</span>
+                    )}
+                  </td>
+                  <td>{new Date(a.submittedAt || a.createdAt).toLocaleDateString()}</td>
+                  <td>
+                    <span className={`badge badge-${a.status}`}>{a.status.replace('_', ' ')}</span>
+                  </td>
+                  <td>
+                    {a.status === 'pending_review' && (
+                      <>
+                        <button className="action-btn btn-approve" onClick={() => approve(a.id)}>
+                          Approve
+                        </button>
+                        <button className="action-btn btn-reject" onClick={() => reject(a.id)}>
+                          Reject
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </AdminShell>
   );
 }
 
-/* ── Commissions ── */
+
 export function AdminCommissionsPage() {
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
@@ -252,13 +566,53 @@ export function AdminCommissionsPage() {
   return (
     <AdminShell title="Commission Earnings">
       <div className="admin-stats">
-        <div className="admin-stat"><span className="val" style={{color:'#4ade80'}}>EGP {parseFloat(totalCommissions).toLocaleString('en-US',{minimumFractionDigits:2})}</span><span className="lbl">Total Earned</span></div>
-        <div className="admin-stat"><span className="val">{totalItems}</span><span className="lbl">Paid Orders</span></div>
+        <div className="admin-stat revenue-card">
+          <span className="val">
+            EGP {parseFloat(totalCommissions).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          </span>
+          <span className="lbl">Total Earned</span>
+        </div>
+        <div className="admin-stat">
+          <span className="val">{totalItems}</span>
+          <span className="lbl">Paid Orders</span>
+        </div>
       </div>
-      <table className="admin-table"><thead><tr><th>Order</th><th>Seller</th><th>Value</th><th>Rate</th><th>Commission</th><th>Status</th><th>Date</th></tr></thead>
-        <tbody>{items.map((o) => <tr key={o.id}><td>#{o.id}</td><td>{o.seller?.fullName||'N/A'}</td><td>EGP {parseFloat(o.totalPrice).toFixed(2)}</td>
-          <td><span className="badge badge-approved">{o.commissionRate}</span></td><td style={{color:'#4ade80',fontWeight:600}}>EGP {parseFloat(o.commissionAmount).toFixed(2)}</td>
-          <td><span className={`badge badge-${o.orderStatus==='delivered'?'approved':'pending_review'}`}>{o.orderStatus}</span></td><td>{new Date(o.createdAt).toLocaleDateString()}</td></tr>)}</tbody></table>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Seller</th>
+              <th>Value</th>
+              <th>Rate</th>
+              <th>Commission</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((o) => (
+              <tr key={o.id}>
+                <td>#{o.id}</td>
+                <td>{o.seller?.fullName || 'N/A'}</td>
+                <td>EGP {parseFloat(o.totalPrice).toFixed(2)}</td>
+                <td>
+                  <span className="badge badge-approved">{o.commissionRate}</span>
+                </td>
+                <td className="commission-amount">
+                  EGP {parseFloat(o.commissionAmount).toFixed(2)}
+                </td>
+                <td>
+                  <span className={`badge badge-${o.orderStatus === 'delivered' ? 'approved' : 'pending_review'}`}>
+                    {o.orderStatus}
+                  </span>
+                </td>
+                <td>{new Date(o.createdAt).toLocaleDateString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <Pagination page={page} totalPages={totalPages} onPageChange={load} />
     </AdminShell>
   );

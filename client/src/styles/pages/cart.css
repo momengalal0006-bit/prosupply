@@ -1,4 +1,4 @@
-/* Cart Page + Address Modal Styles — migrated from cart.css */
+
 .cart-page { max-width: 1200px; margin: 0 auto; padding: 2rem 2rem 3rem; min-height: 60vh; }
 .cart-heading { font-size: 2rem; font-weight: 800; color: var(--navy-dark); margin-bottom: 2rem; }
 .cart-layout { display: grid; grid-template-columns: 1fr 380px; gap: 2.5rem; align-items: start; }
@@ -33,7 +33,7 @@
 .empty-cart { text-align: center; padding: 4rem 2rem; }
 .empty-cart h2 { color: var(--text-main); margin-bottom: 1rem; }
 
-/* Address Modal */
+
 .address-modal-overlay { position: fixed; inset: 0; z-index: 5000; background: rgba(5,10,25,0.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.35s, visibility 0.35s; }
 .address-modal-overlay.open { opacity: 1; visibility: visible; }
 .address-modal { background: linear-gradient(145deg, #0d1629 0%, #0b1121 100%); border: 1.5px solid rgba(0,229,255,0.35); border-radius: 24px; padding: 2.5rem; width: 95%; max-width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 80px rgba(0,0,0,0.6); transform: translateY(0) scale(1); }

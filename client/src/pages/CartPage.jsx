@@ -16,7 +16,7 @@ export default function CartPage() {
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const [showAddressModal, setShowAddressModal] = useState(false);
-  const [addressView, setAddressView] = useState('saved'); // 'saved' | 'form'
+  const [addressView, setAddressView] = useState('saved'); 
   const [cachedAddress, setCachedAddress] = useState(null);
   const [addressForm, setAddressForm] = useState({ street: '', building: '', area: '', city: '', district: '', notes: '' });
   const [processing, setProcessing] = useState(false);
@@ -33,7 +33,7 @@ export default function CartPage() {
     setLoading(false);
   }
 
-  // Silent refresh — no spinner, just updates data in background
+  
   const silentRefresh = useCallback(async () => {
     const [cartRes, summaryRes] = await Promise.all([apiFetch('/api/cart'), apiFetch('/api/cart/summary')]);
     if (cartRes && summaryRes) {
@@ -42,7 +42,7 @@ export default function CartPage() {
     }
   }, []);
 
-  // Recalculate summary from local items
+  
   function recalcSummary(updatedItems) {
     const subtotal = updatedItems.reduce((sum, item) => sum + parseFloat(item.Ad.price) * item.quantity, 0);
     setSummary({ itemCount: updatedItems.length, subtotal });
@@ -50,9 +50,9 @@ export default function CartPage() {
 
   async function updateQty(adId, newQty) {
     if (newQty < 1) return removeItem(adId);
-    if (updatingId) return; // Prevent rapid overlapping clicks
+    if (updatingId) return; 
 
-    // Optimistic update — immediately reflect in UI
+    
     setUpdatingId(adId);
     setItems(prev => {
       const updated = prev.map(item =>
@@ -65,11 +65,11 @@ export default function CartPage() {
     const res = await apiPut(`/api/cart/${adId}`, { quantity: newQty });
     if (res?.success) {
       refreshCartBadge();
-      // Silently sync with server to ensure consistency
+      
       await silentRefresh();
     } else {
       showToast(res?.message || 'Failed to update.', true);
-      // Revert on failure
+      
       await silentRefresh();
     }
     setUpdatingId(null);
@@ -78,7 +78,7 @@ export default function CartPage() {
   async function removeItem(adId) {
     if (updatingId) return;
 
-    // Optimistic remove
+    
     setUpdatingId(adId);
     setItems(prev => {
       const updated = prev.filter(item => item.adId !== adId);
@@ -117,7 +117,7 @@ export default function CartPage() {
     const res = await apiPost('/api/orders/checkout-cart');
     if (res?.success && res.data?.paymentKey) {
       setShowAddressModal(false);
-      // Navigate to the checkout page and pass the paymentKey and subtotal
+      
       navigate('/checkout', { 
         state: { 
           paymentKey: res.data.paymentKey, 
@@ -197,7 +197,7 @@ export default function CartPage() {
         </div>
       )}
 
-      {/* Address Modal */}
+      
       {showAddressModal && (
         <div className="address-modal-overlay open">
           <div className="address-modal">

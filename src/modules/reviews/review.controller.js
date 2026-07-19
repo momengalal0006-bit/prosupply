@@ -19,4 +19,11 @@ const rateSeller = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-module.exports = { rateAd, rateSeller };
+const getSellerProfile = async (req, res, next) => {
+  try {
+    const data = await reviewService.getSellerProfile(req.params.id, req.query);
+    success(res, data);
+  } catch (err) { next(err); }
+};
+
+module.exports = { rateAd, rateSeller, getSellerProfile };

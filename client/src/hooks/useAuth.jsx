@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
         setCartCount(res.data?.summary?.itemCount || 0);
       }
     } catch {
-      /* user not logged in or API down */
+      
     }
   }, []);
 

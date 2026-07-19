@@ -11,7 +11,7 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Hero */}
+      
       <section className="home-hero">
         <div className="home-hero-inner">
           <h1>
@@ -24,7 +24,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Category Cards */}
+      
       <section className="categories-section">
         <div className="categories-grid">
           <Link to="/spare-parts" className="category-card">
@@ -62,10 +62,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Recommended for You */}
+      
       <RecommendedSection />
 
-      {/* Become a Seller CTA */}
+      
       {isLoggedIn && !isSeller && (
         <section className="seller-cta-section">
           <h2>Become a Seller</h2>
@@ -74,7 +74,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* About Section */}
+      
       <section className="about-section">
         <h2>Why ProSupply?</h2>
         <div className="about-features">

@@ -8,10 +8,7 @@ const API =
 
 export { API };
 
-/**
- * Centralized fetch wrapper with credentials and JSON parsing.
- * Redirects to /login on 401.
- */
+
 export async function apiFetch(url, options = {}) {
   try {
     const res = await fetch(`${API}${url}`, {
@@ -19,7 +16,7 @@ export async function apiFetch(url, options = {}) {
       ...options,
     });
     if (res.status === 401) {
-      // Prevent infinite reload loop if already on an auth page
+      
       if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
         window.location.href = '/login';
       }
@@ -32,9 +29,7 @@ export async function apiFetch(url, options = {}) {
   }
 }
 
-/**
- * POST JSON helper
- */
+
 export async function apiPost(url, body) {
   return apiFetch(url, {
     method: 'POST',
@@ -43,9 +38,7 @@ export async function apiPost(url, body) {
   });
 }
 
-/**
- * PUT JSON helper
- */
+
 export async function apiPut(url, body) {
   return apiFetch(url, {
     method: 'PUT',
@@ -54,16 +47,12 @@ export async function apiPut(url, body) {
   });
 }
 
-/**
- * DELETE helper
- */
+
 export async function apiDelete(url) {
   return apiFetch(url, { method: 'DELETE' });
 }
 
-/**
- * POST FormData helper (for file uploads)
- */
+
 export async function apiPostForm(url, formData) {
   return apiFetch(url, {
     method: 'POST',
@@ -71,9 +60,7 @@ export async function apiPostForm(url, formData) {
   });
 }
 
-/**
- * PUT FormData helper
- */
+
 export async function apiPutForm(url, formData) {
   return apiFetch(url, {
     method: 'PUT',

@@ -2,7 +2,6 @@ const { DataTypes } = require('sequelize');
 const bcrypt = require('bcryptjs');
 const sequelize = require('../config/database');
 
-// ─── Permission map ─────────────────────────────────
 const PERMISSIONS = {
   admin:    ['read', 'write', 'delete', 'manage_users', 'manage_roles'],
   supplier: ['read', 'write', 'manage_products'],
@@ -146,31 +145,15 @@ const User = sequelize.define('User', {
   timestamps: true,
 });
 
-// ─── Instance methods ────────────────────────────────
-
-/**
- * Compare a candidate password against the stored hash.
- * @param {string} candidate - The plain-text password to compare.
- * @returns {Promise<boolean>}
- */
 User.prototype.comparePassword = async function (candidate) {
   return bcrypt.compare(candidate, this.password);
 };
 
-/**
- * Check whether this user's role grants a specific permission.
- * @param {string} permission
- * @returns {boolean}
- */
 User.prototype.hasPermission = function (permission) {
   const rolePerms = PERMISSIONS[this.role];
   return rolePerms ? rolePerms.includes(permission) : false;
 };
 
-/**
- * Return a plain object with all sensitive fields stripped out.
- * @returns {object}
- */
 User.prototype.toSafeObject = function () {
   const values = this.toJSON();
   delete values.password;
@@ -180,5 +163,4 @@ User.prototype.toSafeObject = function () {
   return values;
 };
 
-// Export the permission map alongside the model so middleware can use it.
 module.exports = { User, PERMISSIONS };

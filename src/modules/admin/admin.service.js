@@ -19,7 +19,7 @@ const getDashboard = async () => {
   return { totalUsers, pendingApplications, activeAds, totalOrders, totalCommissions, totalPlatformRevenue };
 };
 
-// Seller applications — delegate to seller.service
+
 const getApplications = async (status) => {
   return sellerService.getAllApplications(status);
 };
@@ -38,7 +38,7 @@ const rejectApplication = async (id) => {
   return sellerService.rejectApplication(id);
 };
 
-// Users
+
 const getUsers = async (search, { limit, offset } = {}) => {
   const where = {};
   if (search) {
@@ -90,11 +90,11 @@ const deleteUser = async (id) => {
     throw Object.assign(new Error('Cannot delete admin users.'), { statusCode: 403, code: 'CANNOT_DELETE_ADMIN' });
   }
 
-  // Hard delete all user ads
+  
   await Ad.destroy({ where: { sellerId: id } });
 
 
-  // Clean up associated data
+  
   const { CartItem } = require('../../models/cartItem.model');
   const { Notification } = require('../../models/notification.model');
   const { AdReview } = require('../../models/adReview.model');
@@ -110,7 +110,7 @@ const deleteUser = async (id) => {
   await user.destroy();
 };
 
-// Ads
+
 const getAds = async (search, paginationOpts) => {
   return adRepo.findAllAdmin({ search }, paginationOpts);
 };
@@ -121,7 +121,7 @@ const deleteAd = async (id) => {
   return ad.update({ status: 'deleted' });
 };
 
-// Commissions
+
 const getCommissions = async ({ limit, offset } = {}) => {
   const where = { paymentStatus: 'paid' };
   const queryOpts = {

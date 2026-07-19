@@ -50,7 +50,7 @@ const requestPasswordChange = async (userId) => {
   const hashedOtp = await bcrypt.hash(otp, SALT_ROUNDS);
 
   user.passwordResetToken = hashedOtp;
-  user.passwordResetExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 min
+  user.passwordResetExpires = new Date(Date.now() + 15 * 60 * 1000); 
   await user.save();
 
   const { buildEmail } = require('../../utils/emailTemplate');

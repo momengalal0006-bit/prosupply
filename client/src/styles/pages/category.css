@@ -1,9 +1,6 @@
-/* ══════════════════════════════════════════════════════════
-   Category / Product Listing Styles
-   (Migrated from spareparts.css — shared by all 3 categories)
-   ══════════════════════════════════════════════════════════ */
 
-/* Hero / Search */
+
+
 .hero { background: linear-gradient(135deg, var(--navy-dark) 0%, #0d1a2d 50%, #0b1428 100%); padding: 2rem 2rem 2.5rem; }
 .hero-inner { max-width: 1100px; margin: 0 auto; }
 .search-wrapper { display: flex; max-width: 600px; margin: 0 auto 1.5rem; border-radius: 16px; overflow: hidden; border: 2px solid rgba(0,229,255,0.3); background: rgba(255,255,255,0.04); transition: border-color 0.3s; }
@@ -13,7 +10,7 @@
 .search-btn { padding: 0 1.2rem; background: transparent; border: none; color: var(--cyan-bright); cursor: pointer; display: flex; align-items: center; transition: background 0.3s; }
 .search-btn:hover { background: rgba(0,229,255,0.1); }
 
-/* Filter Bar */
+
 .filter-bar { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 1rem; }
 .filter-pill { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 0.8rem 1.2rem; min-width: 160px; transition: border-color 0.3s; }
 .filter-pill:hover { border-color: rgba(0,229,255,0.3); }
@@ -22,7 +19,7 @@
 .filter-select option { background: var(--navy-dark); }
 .filter-select:focus, .filter-input:focus { border-color: var(--cyan-bright); }
 
-/* Price Slider */
+
 .price-slider-track { position: relative; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 0.5rem; }
 .price-slider-fill { position: absolute; height: 100%; background: var(--cyan-bright); border-radius: 4px; }
 .range-inputs { position: relative; height: 20px; }
@@ -30,19 +27,19 @@
 .range-inputs input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--cyan-bright); cursor: pointer; pointer-events: auto; border: 2px solid white; }
 .price-values { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94A3B8; margin-top: 0.3rem; }
 
-/* Star Selectors */
+
 .star-selector { display: flex; gap: 4px; }
 .star { font-size: 1.3rem; color: #334155; cursor: pointer; transition: color 0.2s, transform 0.2s; }
 .star.active { color: #facc15; }
 .star:hover { transform: scale(1.2); }
 
-/* Products Grid */
+
 .products-section { max-width: 1200px; margin: 0 auto; padding: 2rem; }
 .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
 .no-results { display: none; text-align: center; color: var(--text-muted); padding: 3rem 1rem; font-size: 1.1rem; }
 .no-results.visible { display: block; }
 
-/* Compare */
+
 .compare-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; background: rgba(255,255,255,0.9); border: 1px solid var(--border-color); border-radius: 14px; padding: 0.8rem 1rem; margin-bottom: 1rem; }
 .compare-toolbar-text { color: var(--navy-dark); font-weight: 700; }
 .compare-toolbar-actions { display: flex; gap: 0.6rem; }
@@ -66,7 +63,7 @@
 .compare-col-head button { border: 1px solid rgba(239,68,68,0.35); background: rgba(239,68,68,0.1); color: #ef4444; border-radius: 8px; cursor: pointer; font-size: 0.74rem; font-weight: 700; padding: 0.25rem 0.55rem; }
 .best-value { background: rgba(34,197,94,0.1); color: #15803d; font-weight: 700; }
 
-/* Product Card */
+
 .products-grid { transition: opacity 0.2s; }
 .products-grid.refreshing { opacity: 0.5; pointer-events: none; }
 .product-card { background: white; border: 1px solid var(--border-color); border-radius: 18px; overflow: hidden; transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-decoration: none; color: inherit; display: flex; flex-direction: column; }

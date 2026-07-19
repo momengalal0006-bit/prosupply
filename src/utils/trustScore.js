@@ -1,25 +1,6 @@
-/**
- * Trust Score & Fraud Detection Engine
- * 
- * Computes a 0-100 trust score for sellers based on:
- * - Account age
- * - Verification status (seller application approved)
- * - Order fulfillment rate
- * - Average ratings
- * - Review patterns (suspicious all-5-star detection)
- * - Pricing anomalies (products far below category average)
- * - Activity patterns (too many ads too quickly)
- * 
- * Also exposes fraud flag detection for the admin panel.
- */
 const { Op } = require('sequelize');
 const sequelize = require('../config/database');
 
-/**
- * Calculate trust score for a single seller.
- * @param {string} sellerId — UUID
- * @returns {Object} { score, flags, breakdown }
- */
 const calculateTrustScore = async (sellerId) => {
   const { User } = require('../models/user.model');
   const { Ad } = require('../models/ad.model');
@@ -31,13 +12,12 @@ const calculateTrustScore = async (sellerId) => {
   const seller = await User.findByPk(sellerId);
   if (!seller) return { score: 0, flags: ['User not found'], breakdown: {} };
 
-  let score = 50; // Base score
+  let score = 50;
   const flags = [];
   const breakdown = {};
 
-  // 1. Account Age (0-10 points)
   const accountAgeDays = Math.floor((Date.now() - new Date(seller.createdAt).getTime()) / (1000 * 60 * 60 * 24));
-  const ageScore = Math.min(accountAgeDays / 30, 1) * 10; // Max at 30 days
+  const ageScore = Math.min(accountAgeDays / 30, 1) * 10;
   score += ageScore;
   breakdown.accountAge = { days: accountAgeDays, points: Math.round(ageScore * 10) / 10 };
 
@@ -45,7 +25,6 @@ const calculateTrustScore = async (sellerId) => {
     flags.push('New account (less than 7 days old)');
   }
 
-  // 2. Verification Status (0-10 points)
   const application = await SellerApplication.findOne({
     where: { userId: sellerId, status: 'approved' },
   });
@@ -57,7 +36,6 @@ const calculateTrustScore = async (sellerId) => {
     flags.push('Seller application not verified');
   }
 
-  // 3. Order Fulfillment Rate (0-15 points)
   const totalOrders = await Order.count({ where: { sellerId } });
   const deliveredOrders = await Order.count({ where: { sellerId, orderStatus: 'delivered' } });
   const cancelledOrders = await Order.count({ where: { sellerId, orderStatus: 'cancelled' } });
@@ -82,13 +60,11 @@ const calculateTrustScore = async (sellerId) => {
     breakdown.fulfillment = { total: 0, delivered: 0, cancelled: 0, rate: 0, points: 0 };
   }
 
-  // 4. Average Seller Rating (0-10 points)
   const avgRating = parseFloat(seller.avgSellerRating) || 0;
   const ratingScore = (avgRating / 5) * 10;
   score += ratingScore;
   breakdown.rating = { average: avgRating, points: Math.round(ratingScore * 10) / 10 };
 
-  // 5. Review Pattern Analysis (-10 to +5 points)
   const sellerAds = await Ad.findAll({
     where: { sellerId },
     attributes: ['id'],
@@ -125,14 +101,12 @@ const calculateTrustScore = async (sellerId) => {
     }
   }
 
-  // 6. Pricing Anomaly Detection (-10 to 0 points)
   if (adIds.length > 0) {
     let pricingFlags = 0;
-    for (const adId of adIds.slice(0, 20)) { // Check up to 20 ads
+    for (const adId of adIds.slice(0, 20)) {
       const ad = await Ad.findByPk(adId, { attributes: ['price', 'category'], raw: true });
       if (!ad || !ad.category) continue;
 
-      // Get category average price
       const avgResult = await Ad.findOne({
         where: { category: ad.category, status: 'active', id: { [Op.ne]: adId } },
         attributes: [[sequelize.fn('AVG', sequelize.col('price')), 'avgPrice']],
@@ -160,7 +134,6 @@ const calculateTrustScore = async (sellerId) => {
     }
   }
 
-  // 7. Ad Volume Check (-5 to 0 points)
   if (accountAgeDays <= 7) {
     const recentAdCount = await Ad.count({ where: { sellerId } });
     if (recentAdCount > 20) {
@@ -172,15 +145,11 @@ const calculateTrustScore = async (sellerId) => {
     }
   }
 
-  // Clamp score to 0-100
   score = Math.max(0, Math.min(100, Math.round(score)));
 
   return { score, flags, breakdown };
 };
 
-/**
- * Recalculate and persist trust score for a seller.
- */
 const updateSellerTrustScore = async (sellerId) => {
   const { User } = require('../models/user.model');
   const { score } = await calculateTrustScore(sellerId);
@@ -188,9 +157,6 @@ const updateSellerTrustScore = async (sellerId) => {
   return score;
 };
 
-/**
- * Recalculate trust scores for all sellers.
- */
 const recalculateAllTrustScores = async () => {
   const { User } = require('../models/user.model');
   const sellers = await User.findAll({
@@ -207,9 +173,6 @@ const recalculateAllTrustScores = async () => {
   return results;
 };
 
-/**
- * Get all flagged sellers (trust score < 40 or has active flags).
- */
 const getFlaggedSellers = async () => {
   const { User } = require('../models/user.model');
   const sellers = await User.findAll({
@@ -224,7 +187,6 @@ const getFlaggedSellers = async () => {
     order: [['trustScore', 'ASC']],
   });
 
-  // Calculate detailed flags for each
   const detailed = [];
   for (const seller of sellers) {
     const analysis = await calculateTrustScore(seller.id);
@@ -237,9 +199,6 @@ const getFlaggedSellers = async () => {
   return detailed;
 };
 
-/**
- * Get trust label and color class based on score.
- */
 const getTrustLabel = (score) => {
   if (score === null || score === undefined) return { label: 'Unscored', level: 'unscored' };
   if (score >= 80) return { label: 'Highly Trusted', level: 'high' };

@@ -21,7 +21,6 @@ const sequelize = new Sequelize(
       timestamps: true,
       underscored: false,
     },
-    // Supabase requires SSL connections
     ...(useSSL && {
       dialectOptions: {
         ssl: {

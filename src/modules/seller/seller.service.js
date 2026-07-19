@@ -7,13 +7,13 @@ const { sendEmail } = require('../../utils/mailer');
 const { buildEmail } = require('../../utils/emailTemplate');
 
 const applyAsSeller = async (userId, { businessName, documents }) => {
-  // Check existing application
+  
   const existing = await sellerRepo.findApplicationByUserId(userId);
   if (existing) {
     if (existing.status === 'pending_review' || existing.status === 'approved') {
       throw Object.assign(new Error('You already have a pending or approved application.'), { statusCode: 409, code: 'ALREADY_APPLIED' });
     }
-    // If rejected, allow reapply — fall through
+    
   }
 
   const t = await sequelize.transaction();
@@ -76,7 +76,7 @@ const clearNotifications = async (userId) => {
   await Notification.destroy({ where: { userId } });
 };
 
-// Admin operations (called by admin module)
+
 const approveApplication = async (applicationId) => {
   const t = await sequelize.transaction();
   try {
@@ -89,7 +89,7 @@ const approveApplication = async (applicationId) => {
 
     await t.commit();
 
-    // Email
+    
     try {
       await sendEmail(user.email, 'Seller Application Approved - ProSupply',
         buildEmail({
@@ -141,7 +141,7 @@ const rejectApplication = async (applicationId) => {
 module.exports = {
   applyAsSeller, getDashboard, getNotifications, markAllNotificationsRead, clearNotifications,
   approveApplication, rejectApplication,
-  // Expose repo methods for admin
+  
   getAllApplications: sellerRepo.findAllApplications,
   getApplicationById: sellerRepo.findApplicationById,
 };
